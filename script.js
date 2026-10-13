@@ -150,8 +150,10 @@
 
   /* ================= Фото с заглушкой =================
      Заглушка рисуется самим контейнером (фон / подпись), картинка лежит поверх.
-     Нет файла → img удаляется, остаётся заглушка. Есть файл → он закрывает заглушку. */
+     Нет файла → img удаляется, остаётся заглушка. Есть файл → он закрывает заглушку.
+     src может быть списком: не загрузился первый — пробуем следующий. */
   function attachPhoto(box, src, alt, onLoad) {
+    const srcs = [].concat(src).filter((s, i, a) => s && a.indexOf(s) === i);
     const img = new Image();
     img.alt = alt || "";
     img.loading = "lazy";
@@ -161,9 +163,9 @@
       box.classList.add("has-photo");
       if (onLoad) onLoad(img);
     });
-    img.addEventListener("error", () => img.remove());
+    img.addEventListener("error", () => (srcs.length ? (img.src = srcs.shift()) : img.remove()));
     box.append(img);
-    img.src = src;
+    img.src = srcs.shift() || "";
     return box;
   }
 
@@ -184,10 +186,10 @@
   function fillingPhoto(f, cls = "photo--round") {
     const box = el("div", { class: "photo " + cls + " photo--layers" });
     box.style.backgroundImage = layersGradient(SITE.layers[f.id] || SITE.defaultLayers);
-    return attachPhoto(box, f.photo || `images/fillings/${f.id}.jpg`, `Начинка «${f.name}» в разрезе`);
+    return attachPhoto(box, [f.photo, `images/fillings/${f.id}.jpg`], `Начинка «${f.name}» в разрезе`);
   }
 
-  const dessertSrc = (d) => d.photo || `images/desserts/${d.id}.jpg`;
+  const dessertSrc = (d) => [d.photo, `images/desserts/${d.id}.jpg`];
 
   /* ================= Тост ================= */
   const dialog = $("#order");

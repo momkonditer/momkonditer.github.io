@@ -234,15 +234,16 @@
 
   function thumb(kind, item, cls = "thumb") {
     const box = el("div", { class: cls }, [el("span", { class: "thumb__letter", text: item ? item.name.charAt(0) : "📷" })]);
-    const src = item && (item.photo || `../images/${kind}/${item.id}.jpg`);
-    if (src) {
+    // Сначала фото из таблицы, не загрузилось — файл images/<kind>/<id>.jpg
+    const srcs = item ? [item.photo, `../images/${kind}/${item.id}.jpg`].filter(Boolean) : [];
+    if (srcs.length) {
       const img = new Image();
       img.alt = "";
       img.referrerPolicy = "no-referrer";
       img.onload = () => box.classList.add("has-photo");
-      img.onerror = () => img.remove();
+      img.onerror = () => (srcs.length ? (img.src = srcs.shift()) : img.remove());
       box.append(img);
-      img.src = src;
+      img.src = srcs.shift();
     }
     return box;
   }
