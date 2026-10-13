@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MOM кондитер — домашние торты и десерты на заказ в Электростали</title>
   <meta name="description" content="Домашние торты и десерты на заказ в Электростали. 13 начинок с фото в разрезе, бенто, капкейки, трайфлы. Заказ в Telegram.">
-  <meta name="theme-color" content="#f7f0e7">
+  <meta name="theme-color" content="#f6efe6">
 
   <!-- Превью ссылки в Telegram / Инстаграме.
        TODO: после публикации заменить на полный адрес сайта, например https://momdesert.ru/images/og.jpg -->
@@ -20,144 +20,166 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Шрифты грузятся без блокировки показа страницы -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700&display=swap"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@300;400;500;600;700&family=Oswald:wght@700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@300;400;500;600;700&family=Oswald:wght@700&display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
-  <a class="skip-link" href="#fillings">К прайсу</a>
+  <a class="skip-link" href="#fillings">К начинкам</a>
 
-  <div class="page">
-    <header class="header">
-      <a class="logo" href="#top" aria-label="MOM кондитер — наверх">
+  <header class="header">
+    <div class="container header__inner">
+      <a class="logo logo--mini" href="#top" aria-label="MOM кондитер — наверх">
         <span class="logo__mom">MOM</span><span class="logo__script">кондитер</span>
       </a>
-      <a class="pill pill--sm" data-tg href="#contacts" target="_blank" rel="noopener">Написать</a>
-    </header>
+      <nav class="nav" aria-label="Разделы">
+        <a href="#fillings">Начинки</a>
+        <a href="#desserts">Десерты</a>
+        <a href="#how">Как заказать</a>
+        <a href="#terms">Условия</a>
+        <a href="#contacts">Контакты</a>
+      </nav>
+      <a class="btn btn--primary btn--sm" data-tg href="#contacts" target="_blank" rel="noopener">Написать</a>
+    </div>
+  </header>
 
-    <main id="top">
-      <!-- Первый экран -->
-      <section class="hero" aria-labelledby="hero-title">
-        <!-- Фото: images/hero.jpg; пока его нет — разрез начинки -->
-        <div class="photo photo--hero" data-src="images/hero.jpg|images/fillings/raspberry-pistachio.jpg" data-alt="Торт MOM кондитер" data-label="">
-          <h1 class="hero__title" id="hero-title">Десерты <span class="hero__script">на заказ</span></h1>
+  <main id="top">
+    <!-- Первый экран -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__text">
+          <h1 class="logo logo--big">
+            <span class="logo__mom">MOM</span><span class="logo__script">кондитер</span>
+          </h1>
+          <p class="hero__subtitle">Домашние торты и десерты на заказ в Электростали</p>
+          <p class="hero__lead">Привет! Я Марина — мамаКондитер. Пеку из натуральных продуктов и делаю каждый торт индивидуально. Выберите начинку — и напишите мне, обсудим дизайн.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="#fillings">Выбрать начинку</a>
+            <a class="btn btn--outline" data-tg href="#contacts" target="_blank" rel="noopener">Написать в Telegram</a>
+          </div>
+          <p class="gift" id="hero-gift"><span class="gift__icon" aria-hidden="true">🎁</span><span class="gift__text"></span></p>
         </div>
-        <p class="hero__kicker">кондитер</p>
-        <p class="hero__name">Марина · MOM кондитер</p>
-        <p class="hero__lead">Привет! Я Марина — мамаКондитер. Пеку домашние торты и десерты в Электростали из натуральных продуктов и делаю каждый торт индивидуально. Выберите начинку — и напишите мне, обсудим дизайн.</p>
-        <p class="gift" id="hero-gift"><span class="gift__text"></span></p>
-        <a class="pill" href="#fillings">Выбрать начинку <span aria-hidden="true">↓</span></a>
-      </section>
-
-      <!-- О себе: шахматка «текст — фото» -->
-      <section class="section" id="about" aria-labelledby="about-title">
-        <h2 class="section__title" id="about-title">Почему домашний торт лучше</h2>
-        <p class="section__lead">Каждый торт делаю сама — для вашего праздника, а не для витрины.</p>
-        <!-- Фото: images/about/1.jpg … 4.jpg; пока их нет — разрезы начинок -->
-        <div class="chess">
-          <div class="chess__text"><h3>Только натуральные продукты</h3><p>Сливочное масло вместо маргарина, животные сливки, настоящий шоколад — без порошковых заменителей.</p></div>
-          <div class="photo photo--chess" data-src="images/about/1.jpg|images/fillings/strawberry-milkshake.jpg" data-alt="" data-label=""></div>
-          <div class="photo photo--chess" data-src="images/about/2.jpg|images/fillings/cherry-baileys.jpg" data-alt="" data-label=""></div>
-          <div class="chess__text"><h3>Много начинки</h3><p>В ягодную начинку торта на 2 кг идёт 250–300 г ягод, поэтому домашний торт тяжелее магазинного.</p></div>
-          <div class="chess__text"><h3>Постоянно учусь</h3><p>Регулярно прохожу обучение и мастер-классы.</p></div>
-          <div class="photo photo--chess" data-src="images/about/3.jpg|images/fillings/red-velvet.jpg" data-alt="" data-label=""></div>
-          <div class="photo photo--chess" data-src="images/about/4.jpg|images/fillings/mcflurry.jpg" data-alt="" data-label=""></div>
-          <div class="chess__text"><h3>Индивидуально, не на конвейере</h3><p>Каждый торт делается под конкретный заказ.</p></div>
+        <div class="hero__media">
+          <div class="photo photo--hero" data-src="images/hero.jpg" data-alt="Торт MOM кондитер" data-label="Фото торта"></div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Мои работы -->
-      <section class="section section--wide" id="gallery" aria-labelledby="gallery-title">
-        <h2 class="section__title" id="gallery-title">Мои работы</h2>
-        <div class="carousel" id="gallery-list" tabindex="0" aria-label="Фото работ, листайте в сторону"></div>
-      </section>
-
-      <!-- Прайс (начинки) -->
-      <section class="section" id="fillings" aria-labelledby="fillings-title">
-        <h2 class="section__title" id="fillings-title">Прайс</h2>
-        <p class="section__lead">Цена за 1 кг. Нажмите на начинку — заявка соберётся сама.</p>
+    <!-- Начинки -->
+    <section class="section" id="fillings" aria-labelledby="fillings-title">
+      <div class="container">
+        <h2 class="section__title" id="fillings-title">Начинки</h2>
+        <p class="section__lead">Цена указана за 1 кг. Нажмите «Заказать» — заявка соберётся сама.</p>
         <div class="filters" role="group" aria-label="Фильтр по категориям" id="filters"></div>
         <div id="fillings-list"></div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Десерты -->
-      <section class="section" id="desserts" aria-labelledby="desserts-title">
+    <!-- Десерты -->
+    <section class="section section--tinted" id="desserts" aria-labelledby="desserts-title">
+      <div class="container">
         <h2 class="section__title" id="desserts-title">Десерты</h2>
-        <p class="section__lead">Нажмите на десерт, чтобы заказать или узнать цену.</p>
-        <div class="tiles" id="desserts-list"></div>
-      </section>
+        <p class="section__lead">Цены уточняйте у Марины — нажмите «Узнать цену».</p>
+        <div class="grid grid--desserts" id="desserts-list"></div>
+      </div>
+    </section>
 
-      <!-- Бонусы (тексты из таблицы) -->
-      <section class="section" id="bonuses" aria-labelledby="bonuses-title">
-        <h2 class="section__title" id="bonuses-title">Бонусы</h2>
-        <ul class="bonuses" id="promos-list"></ul>
-      </section>
+    <!-- Как заказать -->
+    <section class="section" id="how" aria-labelledby="how-title">
+      <div class="container">
+        <h2 class="section__title" id="how-title">Как заказать</h2>
+        <ol class="steps">
+          <li class="step"><span class="step__num">1</span><h3>Выберите начинку</h3><p>Посмотрите разрезы и нажмите «Заказать» на понравившейся.</p></li>
+          <li class="step"><span class="step__num">2</span><h3>Отправьте заявку в Telegram</h3><p>Текст заявки скопируется сам — останется вставить его в чат.</p></li>
+          <li class="step"><span class="step__num">3</span><h3>Согласуйте дизайн</h3><p>Обсудим декор и детали, затем вносится предоплата <span data-setting="prepayment">50</span>%.</p></li>
+          <li class="step"><span class="step__num">4</span><h3>Заберите торт</h3><p>Самовывоз или доставка по Электростали.</p></li>
+        </ol>
+      </div>
+    </section>
 
-      <!-- Отзывы: только реальные скриншоты из хайлайта «Отзывы» -->
-      <section class="section section--wide" id="reviews" aria-labelledby="reviews-title">
-        <h2 class="section__title" id="reviews-title">Отзывы</h2>
-        <div class="carousel carousel--story" id="reviews-list" tabindex="0" aria-label="Скриншоты отзывов, листайте в сторону"></div>
-      </section>
-
-      <!-- Частые вопросы -->
-      <section class="section" id="faq" aria-labelledby="faq-title">
-        <h2 class="section__title" id="faq-title">Частые вопросы</h2>
-        <div class="faq">
-          <details class="faq__item" id="how">
-            <summary>Как оформить заказ</summary>
-            <ol class="faq__answer faq__steps">
-              <li>Выберите начинку в прайсе и нажмите на неё.</li>
-              <li>Укажите вес и дату — текст заявки скопируется сам, останется вставить его в чат Telegram.</li>
-              <li>Обсудим декор и детали, затем вносится предоплата <span data-setting="prepayment">50</span>%.</li>
-              <li>Заберите торт сами или закажите доставку.</li>
-            </ol>
-          </details>
-          <details class="faq__item" id="terms">
-            <summary>Предоплата</summary>
-            <p class="faq__answer">Предоплата <span data-setting="prepayment">50</span>% от стоимости — обязательна для всех заказов. Вносится после того, как согласуем дизайн.</p>
-          </details>
-          <details class="faq__item">
-            <summary>Доставка и самовывоз</summary>
-            <ul class="faq__answer" id="faq-delivery"></ul>
-          </details>
-          <details class="faq__item">
-            <summary>Отмена заказа</summary>
-            <p class="faq__answer" id="faq-cancel"></p>
-          </details>
-          <details class="faq__item">
-            <summary>Как хранить торт</summary>
-            <!-- TODO: уточнить у Марины текст про хранение и срок годности -->
-            <p class="faq__answer">Храните торт в холодильнике. Достаньте его за 20–30 минут до подачи — так крем станет нежнее, а вкус ярче. Сколько хранится ваша начинка, подскажу при заказе.</p>
-          </details>
+    <!-- Условия и бонусы -->
+    <section class="section section--tinted" id="terms" aria-labelledby="terms-title">
+      <div class="container">
+        <h2 class="section__title" id="terms-title">Условия и бонусы</h2>
+        <div class="panels">
+          <div class="panel">
+            <h3 class="panel__title">Условия</h3>
+            <ul class="panel__list" id="terms-list"></ul>
+          </div>
+          <div class="panel panel--accent">
+            <h3 class="panel__title">Бонусы</h3>
+            <ul class="panel__list" id="promos-list"></ul>
+          </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Не нашли ответ -->
-      <section class="section cta" id="contacts" aria-labelledby="cta-title">
-        <h2 class="cta__title" id="cta-title">Не нашли ответ?</h2>
-        <p class="cta__text">Напишите мне — подберу начинку и дизайн.</p>
-        <a class="pill pill--dark pill--block" data-tg target="_blank" rel="noopener">Написать кондитеру</a>
+    <!-- Обо мне -->
+    <section class="section" id="about" aria-labelledby="about-title">
+      <div class="container about">
+        <div class="about__media">
+          <div class="photo photo--portrait" data-src="images/marina.jpg" data-alt="Марина — MOM кондитер" data-label="Фото Марины"></div>
+        </div>
+        <div class="about__text">
+          <h2 class="section__title" id="about-title">Почему домашний торт лучше</h2>
+          <p class="quote">Каждый торт делаю сама — для вашего праздника, а не для витрины.</p>
+          <ul class="features">
+            <li><strong>Только натуральные продукты.</strong> Сливочное масло вместо маргарина, животные сливки, настоящий шоколад — без порошковых заменителей.</li>
+            <li><strong>Много начинки.</strong> В ягодную начинку торта на 2 кг идёт 250–300 г ягод, поэтому домашний торт тяжелее магазинного.</li>
+            <li><strong>Постоянно учусь.</strong> Регулярно прохожу обучение и мастер-классы.</li>
+            <li><strong>Индивидуально, не на конвейере.</strong> Каждый торт делается под конкретный заказ.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
+    <!-- Галерея -->
+    <section class="section section--tinted" id="gallery" aria-labelledby="gallery-title">
+      <div class="container">
+        <h2 class="section__title" id="gallery-title">Мои работы</h2>
+        <div class="grid grid--gallery" id="gallery-list"></div>
+      </div>
+    </section>
+
+    <!-- Отзывы: только реальные скриншоты из хайлайта «Отзывы» -->
+    <section class="section" id="reviews" aria-labelledby="reviews-title">
+      <div class="container">
+        <h2 class="section__title" id="reviews-title">Отзывы</h2>
+        <p class="section__lead">Скриншоты отзывов от клиентов.</p>
+        <div class="grid grid--reviews" id="reviews-list"></div>
+      </div>
+    </section>
+
+    <!-- Контакты -->
+    <section class="section section--tinted" id="contacts" aria-labelledby="contacts-title">
+      <div class="container">
+        <h2 class="section__title" id="contacts-title">Контакты</h2>
         <dl class="contacts">
-          <div><dt>Telegram</dt><dd><a data-tg data-text="telegramLabel" target="_blank" rel="noopener"></a></dd></div>
-          <div><dt>Телефон</dt><dd><a data-phone data-text="phone"></a></dd></div>
-          <div><dt>Instagram</dt><dd><a data-ig data-text="instagramLabel" target="_blank" rel="noopener"></a></dd></div>
-          <div><dt>Самовывоз</dt><dd class="selectable" data-text="pickupAddress"></dd></div>
-          <div><dt>Доставка</dt><dd data-text="delivery"></dd></div>
+          <div class="contacts__row"><dt>Telegram</dt><dd><a data-tg data-text="telegramLabel" target="_blank" rel="noopener"></a></dd></div>
+          <div class="contacts__row"><dt>Телефон</dt><dd><a data-phone data-text="phone"></a></dd></div>
+          <div class="contacts__row"><dt>Instagram</dt><dd><a data-ig data-text="instagramLabel" target="_blank" rel="noopener"></a></dd></div>
+          <div class="contacts__row"><dt>Самовывоз</dt><dd class="selectable" data-text="pickupAddress"></dd></div>
+          <div class="contacts__row"><dt>Доставка</dt><dd data-text="delivery"></dd></div>
         </dl>
-      </section>
-    </main>
+        <div class="contacts__actions">
+          <a class="btn btn--primary" data-tg target="_blank" rel="noopener">Написать в Telegram</a>
+          <a class="btn btn--outline" data-ig target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+    </section>
+  </main>
 
-    <footer class="footer">
-      <span class="logo"><span class="logo__mom">MOM</span><span class="logo__script">кондитер</span></span>
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span class="logo logo--mini"><span class="logo__mom">MOM</span><span class="logo__script">кондитер</span></span>
       <p>Домашние торты и десерты на заказ · <span data-text="city"></span></p>
       <p class="footer__small">Заказ, оплата и детали — в личной переписке в Telegram.</p>
-    </footer>
-  </div>
+    </div>
+  </footer>
 
   <a class="fab" data-tg href="#contacts" target="_blank" rel="noopener" aria-label="Заказать в Telegram">
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M21.4 4.6 2.9 11.7c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.9-1.4-1.5ZM8.3 14.4l9.6-6.1c.5-.3.9-.1.5.2l-8.1 7.3-.3 3.3-1.7-4.7Z"/></svg>
+    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M21.4 4.6 2.9 11.7c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.9-1.4-1.5ZM8.3 14.4l9.6-6.1c.5-.3.9-.1.5.2l-8.1 7.3-.3 3.3-1.7-4.7Z"/></svg>
     <span>Заказать</span>
   </a>
 
@@ -172,7 +194,6 @@
           <p class="sheet__meta" id="order-meta"></p>
         </div>
       </div>
-      <p class="sheet__desc" id="order-desc"></p>
 
       <div class="field" id="order-weight-field">
         <span class="field__label" id="weight-label">Вес торта</span>
@@ -208,8 +229,6 @@
         <label class="field__label" for="order-manual-text">Скопируйте текст заявки и отправьте его в чат:</label>
         <textarea id="order-manual-text" class="input" rows="5" readonly></textarea>
       </div>
-
-      <button type="button" class="link-btn sheet__link" id="order-link" hidden>Скопировать ссылку на начинку</button>
     </div>
   </dialog>
 
@@ -217,6 +236,6 @@
 
   <script src="data.js?v=3"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=4"></script>
 </body>
 </html>

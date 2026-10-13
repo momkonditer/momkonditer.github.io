@@ -188,7 +188,7 @@
     return `images/${dir}/${id}.jpg?v=${encodeURIComponent(SITE.photoVersion || 1)}`;
   }
 
-  function fillingPhoto(f, cls = "photo--round") {
+  function fillingPhoto(f, cls = "photo--tile") {
     const box = el("div", { class: "photo " + cls + " photo--layers" });
     box.style.backgroundImage = layersGradient(SITE.layers[f.id] || SITE.defaultLayers);
     return attachPhoto(box, [f.photo, localPhoto("fillings", f.id)], `Начинка «${f.name}» в разрезе`);
@@ -249,15 +249,13 @@
     gift.hidden = !D.settings.promoFirstShort;
     $(".gift__text", gift).textContent = D.settings.promoFirstShort || "";
 
-    // Частые вопросы: ответы из настроек
-    $("#faq-cancel").textContent = D.cancelDays > 0
-      ? `При отказе позже чем за ${D.cancelDays} ${daysWord(D.cancelDays)} до выдачи предоплата не возвращается.`
-      : "При отказе в день выдачи предоплата не возвращается.";
-    const delivery = []
+    const terms = [`Предоплата ${D.prepayment}% от стоимости — обязательна для всех заказов.`]
+      .concat(D.cancelDays > 0
+        ? `При отказе позже чем за ${D.cancelDays} ${daysWord(D.cancelDays)} до выдачи предоплата не возвращается.`
+        : "При отказе в день выдачи предоплата не возвращается.")
       .concat(C.pickupAddress ? [`Самовывоз: ${C.pickupAddress}.`] : [])
-      .concat(C.delivery ? [`${C.delivery.replace(/\.$/, "")}.`] : [])
-      .concat(D.settings.promoFirst ? [`Первый заказ: ${lowerFirst(D.settings.promoFirst)}`] : []);
-    $("#faq-delivery").replaceChildren(...delivery.map((t) => el("li", { text: t })));
+      .concat(C.delivery ? [`${C.delivery.replace(/\.$/, "")}.`] : []);
+    $("#terms-list").replaceChildren(...terms.map((t) => el("li", { text: t })));
 
     const promos = [
       { title: "Подарок за первый заказ", text: D.settings.promoFirst },
@@ -265,7 +263,6 @@
     ].filter((p) => p.text);
     $("#promos-list").replaceChildren(...promos.map((p) =>
       el("li", {}, [el("strong", { text: p.title }), el("span", { text: p.text })])));
-    $("#bonuses").hidden = !promos.length;
   }
 
   /* ================= Начинки ================= */
@@ -273,12 +270,13 @@
   const filters = $("#filters");
   let currentFilter = "all";
 
-  const catPrice = (c) => `${c.same ? "" : "от "}${money(c.price)} руб`;
+  const catPrice = (c) => `${c.same ? "" : "от "}${money(c.price)} ₽`;
 
   function renderFillings() {
+    let num = 0;
     const groups = D.categories.map((cat) => {
-      const grid = el("div", { class: "tiles" });
-      D.fillings.filter((x) => x.cat === cat).forEach((x) => grid.append(fillingTile(x)));
+      const grid = el("div", { class: "grid grid--fillings" });
+      D.fillings.filter((x) => x.cat === cat).forEach((x) => grid.append(fillingCard(x, ++num)));
       return el("div", { class: "group", "data-cat": cat.id }, [
         el("div", { class: "group__head" }, [
           el("h3", { class: "group__title", text: cat.name }),
@@ -292,26 +290,26 @@
 
     const btn = (id, label) =>
       el("button", { type: "button", class: "chip", "data-filter": id, text: label, onclick: () => setFilter(id) });
-    filters.replaceChildren(btn("all", "Все"), ...D.categories.map((c) => btn(c.id, c.name)));
+    filters.replaceChildren(btn("all", "Все"), ...D.categories.map((c) => btn(c.id, `${c.name} ${catPrice(c)}`)));
     filters.hidden = D.categories.length < 2;
     if (!D.categories.some((c) => c.id === currentFilter)) currentFilter = "all";
     setFilter(currentFilter);
   }
 
-  // Плитка: цена мелко, квадратное фото, название. Нажимается вся плитка (кнопка растянута на неё)
-  function tile(order, priceText, photo, priceCls) {
-    const item = order.item;
-    return el("article", { class: `tile tile--${order.type}`, id: item.id, "data-item": item.id }, [
-      el("p", { class: "tile__price" + (priceCls ? " " + priceCls : ""), text: priceText }),
-      photo,
-      el("button", { type: "button", class: "tile__btn", text: item.name,
-        "aria-label": `${item.name}, ${priceText}. Заказать`,
-        onclick: (e) => openOrder(order, e.currentTarget) }),
+  function fillingCard(item, num) {
+    return el("article", { class: "card card--filling", id: item.id, "data-item": item.id }, [
+      fillingPhoto(item),
+      el("span", { class: "card__num", text: pad(num) }),
+      el("h4", { class: "card__title", text: item.name }),
+      el("p", { class: "card__desc", text: item.desc }),
+      el("p", { class: "card__price" }, [el("strong", { text: `${money(item.price)} ₽` }), " / кг"]),
+      el("div", { class: "card__actions" }, [
+        el("button", { type: "button", class: "btn btn--primary btn--block", text: "Заказать",
+          onclick: (e) => openOrder({ type: "filling", item }, e.currentTarget) }),
+        el("button", { type: "button", class: "link-btn", text: "Скопировать ссылку на начинку",
+          onclick: () => copyLink(item.id) }),
+      ]),
     ]);
-  }
-
-  function fillingTile(item) {
-    return tile({ type: "filling", item }, `${money(item.price)} руб/кг`, fillingPhoto(item, ""));
   }
 
   function setFilter(id) {
@@ -320,21 +318,28 @@
     $$(".group", fillingsList).forEach((g) => (g.hidden = id !== "all" && g.dataset.cat !== id));
   }
 
-  function copyLink(id, what) {
+  function copyLink(id) {
     const url = location.href.split("#")[0] + "#" + id;
     copyText(url).then((ok) => {
-      if (ok) showToast(`Ссылка на ${what} скопирована`);
-      else window.prompt(`Скопируйте ссылку на ${what}:`, url);
+      if (ok) showToast("Ссылка на начинку скопирована");
+      else window.prompt("Скопируйте ссылку на начинку:", url);
     });
   }
 
   /* ================= Десерты ================= */
   function renderDesserts() {
     $("#desserts-list").replaceChildren(...D.desserts.map((d) =>
-      tile({ type: "dessert", item: d },
-        d.price ? `${money(d.price)} руб` : "Узнать цену",
-        placeholderPhoto("photo--square", dessertSrc(d), d.name, "Фото скоро"),
-        d.price ? "" : "tile__price--ask")
+      el("article", { class: "card card--dessert", id: d.id, "data-item": d.id }, [
+        placeholderPhoto("photo--square", dessertSrc(d), d.name, `Фото: ${d.name}`),
+        el("h3", { class: "card__title", text: d.name }),
+        el("p", { class: "card__desc", text: d.desc }),
+        d.price ? el("p", { class: "card__price" }, [el("strong", { text: `${money(d.price)} ₽` })]) : null,
+        el("div", { class: "card__actions" }, [
+          el("button", { type: "button", class: "btn btn--outline btn--block",
+            text: d.price ? "Заказать" : "Узнать цену",
+            onclick: (e) => openOrder({ type: "dessert", item: d }, e.currentTarget) }),
+        ]),
+      ])
     ));
     $("#desserts").hidden = !D.desserts.length;
   }
@@ -343,15 +348,14 @@
   function renderStatic() {
     const gl = $("#gallery-list");
     SITE.gallery.forEach((file, i) =>
-      gl.append(placeholderPhoto("", `images/gallery/${file}`, `Работа ${i + 1}`, `Фото работы ${pad(i + 1)}`))
+      gl.append(placeholderPhoto("photo--square", `images/gallery/${file}`, `Работа ${i + 1}`, `Фото работы ${pad(i + 1)}`))
     );
-    carousel(gl);
 
     const rl = $("#reviews-list");
     SITE.reviews.forEach((file, i) => {
       const src = `images/reviews/${file}`;
       rl.append(
-        placeholderPhoto("", src, `Скриншот отзыва ${i + 1}`, "Здесь будет скриншот отзыва", (img) => {
+        placeholderPhoto("photo--story", src, `Скриншот отзыва ${i + 1}`, "Здесь будет скриншот отзыва", (img) => {
           // Скриншот можно открыть крупно
           const a = el("a", { href: src, target: "_blank", rel: "noopener", "aria-label": `Открыть отзыв ${i + 1}` });
           img.replaceWith(a);
@@ -359,52 +363,10 @@
         })
       );
     });
-    carousel(rl);
 
     $$(".photo[data-src]").forEach((box) => {
       box.append(el("span", { class: "photo__label", text: box.dataset.label }));
-      // data-src="свой файл|запасной"; к фото начинок добавляем версию, как в прайсе
-      const srcs = box.dataset.src.split("|").map((s) =>
-        s.startsWith("images/fillings/") ? `${s}?v=${encodeURIComponent(SITE.photoVersion || 1)}` : s);
-      attachPhoto(box, srcs, box.dataset.alt);
-    });
-  }
-
-  /* ================= Карусель =================
-     Листается свайпом (scroll-snap). Фото по центру крупнее — класс is-active. */
-  function carousel(root) {
-    const items = () => Array.from(root.children);
-    let raf = 0;
-    const nearest = () => {
-      const mid = root.scrollLeft + root.clientWidth / 2;
-      let best = null, dist = Infinity;
-      items().forEach((n) => {
-        const d = Math.abs(n.offsetLeft + n.offsetWidth / 2 - mid);
-        if (d < dist) { dist = d; best = n; }
-      });
-      return best;
-    };
-    const mark = () => {
-      raf = 0;
-      const active = nearest();
-      items().forEach((n) => n.classList.toggle("is-active", n === active));
-    };
-    const center = (n, smooth) => root.scrollTo({
-      left: n.offsetLeft + n.offsetWidth / 2 - root.clientWidth / 2,
-      behavior: smooth ? "smooth" : "auto",
-    });
-    root.addEventListener("scroll", () => { if (!raf) raf = requestAnimationFrame(mark); }, { passive: true });
-    // нажали на боковое фото — оно выезжает в центр
-    root.addEventListener("click", (e) => {
-      const n = items().find((x) => x.contains(e.target));
-      if (n && !n.classList.contains("is-active")) { e.preventDefault(); center(n, true); }
-    });
-    window.addEventListener("resize", mark);
-    // стартуем со второго фото, чтобы по бокам были видны соседние
-    requestAnimationFrame(() => {
-      const start = items()[Math.min(1, items().length - 1)];
-      if (start) center(start, false);
-      mark();
+      attachPhoto(box, box.dataset.src, box.dataset.alt);
     });
   }
 
@@ -413,8 +375,6 @@
     title: $("#order-title"),
     meta: $("#order-meta"),
     photo: $("#order-photo"),
-    desc: $("#order-desc"),
-    link: $("#order-link"),
     weightField: $("#order-weight-field"),
     weight: $("#order-weight"),
     dateBtn: $("#order-date-btn"),
@@ -495,8 +455,6 @@
   }
 
   f.dateBtn.addEventListener("click", () => toggleCalendar(f.cal.hidden));
-  f.link.addEventListener("click", () =>
-    current && copyLink(current.item.id, current.type === "filling" ? "начинку" : "десерт"));
 
   /* --- окно --- */
   function openOrder(order, from) {
@@ -514,13 +472,9 @@
       : item.price ? `${money(item.price)} ₽` : "Цену подскажет Марина";
     f.photo.replaceChildren(
       isFilling
-        ? fillingPhoto(item, "photo--round photo--sm")
+        ? fillingPhoto(item, "photo--tile photo--sm")
         : placeholderPhoto("photo--round photo--sm", dessertSrc(item), item.name, "")
     );
-    f.desc.textContent = item.desc || "";
-    f.desc.hidden = !item.desc;
-    f.link.textContent = isFilling ? "Скопировать ссылку на начинку" : "Скопировать ссылку на десерт";
-    f.link.hidden = false;
     f.weightField.hidden = !isFilling;
     f.totalBox.hidden = !isFilling;
     f.send.href = D.contacts.telegram;
