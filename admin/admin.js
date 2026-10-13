@@ -235,7 +235,7 @@
   function thumb(kind, item, cls = "thumb") {
     const box = el("div", { class: cls }, [el("span", { class: "thumb__letter", text: item ? item.name.charAt(0) : "📷" })]);
     // Сначала фото из таблицы, не загрузилось — файл images/<kind>/<id>.jpg
-    const srcs = item ? [item.photo, `../images/${kind}/${item.id}.jpg`].filter(Boolean) : [];
+    const srcs = item ? [item.photo, `../images/${kind}/${item.id}.jpg?v=${encodeURIComponent(SITE.photoVersion || 1)}`].filter(Boolean) : [];
     if (srcs.length) {
       const img = new Image();
       img.alt = "";

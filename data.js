@@ -18,6 +18,10 @@ window.SITE = {
   // Адрес веб-приложения Apps Script (…/exec). Пусто — сайт работает только на fallback. См. SETUP.md
   api: "https://script.google.com/macros/s/AKfycbwzl_Udcgu94t50_FCEVZ8lAZ_sYS2Ylp_QNjuoxv8V8O-WAtD1uy2WiSw3CQqQGKkS/exec",
 
+  // Версия фото товаров в images/fillings и images/desserts.
+  // Заменили файл с тем же именем — увеличьте число, и браузеры загрузят новое фото, а не старое из кэша.
+  photoVersion: 2,
+
   // Порядок категорий на сайте; новые категории из таблицы встанут после этих
   categoryOrder: ["Стандарт", "Лайт", "Премиум"],
 

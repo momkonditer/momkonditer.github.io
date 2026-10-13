@@ -183,13 +183,18 @@
     return `linear-gradient(to top, ${stops.join(", ")})`;
   }
 
+  // Файл товара из папки сайта; ?v= сбрасывает кэш после замены фото (SITE.photoVersion)
+  function localPhoto(dir, id) {
+    return `images/${dir}/${id}.jpg?v=${encodeURIComponent(SITE.photoVersion || 1)}`;
+  }
+
   function fillingPhoto(f, cls = "photo--round") {
     const box = el("div", { class: "photo " + cls + " photo--layers" });
     box.style.backgroundImage = layersGradient(SITE.layers[f.id] || SITE.defaultLayers);
-    return attachPhoto(box, [f.photo, `images/fillings/${f.id}.jpg`], `Начинка «${f.name}» в разрезе`);
+    return attachPhoto(box, [f.photo, localPhoto("fillings", f.id)], `Начинка «${f.name}» в разрезе`);
   }
 
-  const dessertSrc = (d) => [d.photo, `images/desserts/${d.id}.jpg`];
+  const dessertSrc = (d) => [d.photo, localPhoto("desserts", d.id)];
 
   /* ================= Тост ================= */
   const dialog = $("#order");
