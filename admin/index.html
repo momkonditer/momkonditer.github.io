@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>MOM админка</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f7f0e7">
+
+  <!-- «Добавить на экран Домой» -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="MOM админка">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Шрифты грузятся без блокировки показа страницы -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Oswald:wght@500;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Oswald:wght@500;700&display=swap"></noscript>
+  <link rel="stylesheet" href="../calendar.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <header class="bar">
+    <button class="bar__back" id="back" type="button" hidden>‹ Назад</button>
+    <h1 class="bar__title" id="title">MOM кондитер</h1>
+  </header>
+
+  <main class="view" id="view" tabindex="-1"></main>
+
+  <!-- Окно редактирования товара -->
+  <dialog class="editor" id="editor" aria-labelledby="editor-title"></dialog>
+
+  <!-- Вопрос «Точно?» внутри страницы -->
+  <dialog class="ask" id="ask" aria-labelledby="ask-text">
+    <p class="ask__text" id="ask-text"></p>
+    <div class="ask__actions">
+      <button type="button" class="btn" id="ask-yes"></button>
+      <button type="button" class="btn btn--ghost" id="ask-no"></button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="../data.js"></script>
+  <script src="../calendar.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
