@@ -188,7 +188,7 @@
     return `images/${dir}/${id}.jpg?v=${encodeURIComponent(SITE.photoVersion || 1)}`;
   }
 
-  function fillingPhoto(f, cls = "photo--tile") {
+  function fillingPhoto(f, cls = "photo--round") {
     const box = el("div", { class: "photo " + cls + " photo--layers" });
     box.style.backgroundImage = layersGradient(SITE.layers[f.id] || SITE.defaultLayers);
     return attachPhoto(box, [f.photo, localPhoto("fillings", f.id)], `Начинка «${f.name}» в разрезе`);
@@ -472,7 +472,7 @@
       : item.price ? `${money(item.price)} ₽` : "Цену подскажет Марина";
     f.photo.replaceChildren(
       isFilling
-        ? fillingPhoto(item, "photo--tile photo--sm")
+        ? fillingPhoto(item, "photo--round photo--sm")
         : placeholderPhoto("photo--round photo--sm", dessertSrc(item), item.name, "")
     );
     f.weightField.hidden = !isFilling;
