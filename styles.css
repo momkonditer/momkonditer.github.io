@@ -199,6 +199,10 @@ button { font: inherit; color: inherit; }
 .photo.has-photo .photo__label { visibility: hidden; }
 
 .photo--round { border-radius: 50%; aspect-ratio: 1; width: 100%; max-width: 168px; margin-inline: auto; }
+/* круг в карточке начинки — ~88% ширины карточки (padding карточки 12px, на планшете и шире 16px) */
+.card--filling .photo--round { width: min(100%, calc((100% + 24px) * 0.88)); max-width: none; }
+/* лёгкий зум: края фото не видны по краю круга */
+.photo--round img { transform: scale(1.08); }
 .photo--layers {
   border: 0;
   box-shadow: inset 0 0 0 5px rgba(255, 250, 243, 0.9), 0 4px 14px rgba(74, 48, 39, 0.12);
@@ -437,6 +441,7 @@ textarea.input { resize: vertical; }
   .grid--fillings, .grid--desserts, .grid--gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .grid--reviews { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .card { padding: 18px 16px 10px; }
+  .card--filling .photo--round { width: min(100%, calc((100% + 32px) * 0.88)); }
   .steps { grid-template-columns: repeat(2, 1fr); }
   .panels { grid-template-columns: repeat(2, 1fr); }
   .contacts__row { grid-template-columns: 140px 1fr; align-items: baseline; }

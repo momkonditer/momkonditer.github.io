@@ -20,7 +20,7 @@ window.SITE = {
 
   // Версия фото товаров в images/fillings и images/desserts.
   // Заменили файл с тем же именем — увеличьте число, и браузеры загрузят новое фото, а не старое из кэша.
-  photoVersion: 3,
+  photoVersion: 4,
 
   // Порядок категорий на сайте; новые категории из таблицы встанут после этих
   categoryOrder: ["Стандарт", "Лайт", "Премиум", "Советская классика"],
@@ -31,7 +31,7 @@ window.SITE = {
   },
 
   // Фото из images/ с другим именем файла: id товара → имя файла без .jpg
-  photoFiles: { "praga-classic": "praga" },
+  photoFiles: {},
 
   // Старые ссылки #id → новый id (товар переехал)
   idAliases: { "praga": "praga-classic" },
