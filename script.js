@@ -192,7 +192,8 @@
 
   // Файл товара из папки сайта; ?v= сбрасывает кэш после замены фото (SITE.photoVersion)
   function localPhoto(dir, id) {
-    return `images/${dir}/${id}.jpg?v=${encodeURIComponent(SITE.photoVersion || 1)}`;
+    const file = (SITE.photoFiles || {})[id] || id;
+    return `images/${dir}/${file}.jpg?v=${encodeURIComponent(SITE.photoVersion || 1)}`;
   }
 
   function fillingPhoto(f, cls = "photo--round") {
@@ -652,8 +653,10 @@
   let highlightTimer;
   let hashDone = false;
   function handleHash() {
-    const id = decodeURIComponent(location.hash.slice(1));
+    let id = decodeURIComponent(location.hash.slice(1));
     if (!id) return;
+    // старая ссылка на товар, который переехал (#praga → #praga-classic)
+    if (!document.getElementById(id) && (SITE.idAliases || {})[id]) id = SITE.idAliases[id];
     const card = $$("[data-item]").find((n) => n.id === id);
     if (!card) return;
     hashDone = true;
