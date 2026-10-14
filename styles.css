@@ -228,6 +228,7 @@ button { font: inherit; color: inherit; }
 }
 .group__title { font-family: var(--font-head); font-weight: 400; font-size: 24px; }
 .group__price { font-size: 20px; font-weight: 400; color: var(--rose-ink); white-space: nowrap; }
+.group__note { margin: -6px 0 14px; font-size: 14px; font-weight: 300; color: var(--muted); }
 
 /* ===== Карточки ===== */
 .card {
@@ -371,6 +372,10 @@ button { font: inherit; color: inherit; }
 input[type="date"].input { -webkit-appearance: none; appearance: none; display: block; }
 input[type="date"]::-webkit-date-and-time-value { text-align: left; }
 textarea.input { resize: vertical; }
+.select {
+  -webkit-appearance: none; appearance: none; cursor: pointer; padding-right: 40px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%232a201c' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 16px center;
+}
 
 .date-btn {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;

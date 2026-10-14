@@ -36,7 +36,7 @@
 
   /* ================= Данные ================= */
 
-  const KNOWN_CATS = { "Стандарт": "standard", "Лайт": "light", "Премиум": "premium" };
+  const KNOWN_CATS = { "Стандарт": "standard", "Лайт": "light", "Премиум": "premium", "Советская классика": "classic" };
   let D = null;          // нормализованные данные, по ним рисуется страница
   let rawString = "";    // чтобы не перерисовывать, если с сервера пришло то же самое
 
@@ -93,7 +93,9 @@
     const categories = sorted.map((name, i) => {
       const prices = fillings.filter((f) => f.category === name).map((f) => f.price);
       const min = Math.min.apply(null, prices);
-      return { id: KNOWN_CATS[name] || `cat-${i + 1}`, name, price: min, same: prices.every((p) => p === min) };
+      const info = (SITE.categoryInfo || {})[name] || {};
+      return { id: KNOWN_CATS[name] || `cat-${i + 1}`, name, price: min, same: prices.every((p) => p === min),
+        note: info.note || "", minWeight: Number(info.minWeight) > 0 ? Number(info.minWeight) : null };
     });
     fillings.forEach((f) => (f.cat = categories.find((c) => c.name === f.category)));
 
@@ -108,7 +110,12 @@
       settings: s,
       fillings,
       categories,
-      desserts: list(raw && raw.desserts, fb.desserts),
+      desserts: list(raw && raw.desserts, fb.desserts).map((d) => Object.assign(d, {
+        unit: String(d.unit || "").trim(),
+        minQty: Number(d.minQty) >= 1 ? Math.floor(Number(d.minQty)) : null,
+        options: (Array.isArray(d.options) ? d.options : String(d.options || "").split(/\s*[;\n]\s*/))
+          .map((o) => String(o).trim()).filter(Boolean),
+      })),
       busy,
       prepayment: Number(s.prepayment) >= 0 ? Number(s.prepayment) : 50,
       cancelDays: Number(s.cancelDays) >= 0 ? Math.floor(Number(s.cancelDays)) : 2,
@@ -282,6 +289,7 @@
           el("h3", { class: "group__title", text: cat.name }),
           el("span", { class: "group__price", text: `${catPrice(cat)}/кг` }),
         ]),
+        cat.note ? el("p", { class: "group__note", text: cat.note }) : null,
         grid,
       ]);
     });
@@ -327,13 +335,30 @@
   }
 
   /* ================= Десерты ================= */
+  // «300 ₽/шт · от 4 шт», «2 500 ₽/кг», «1 700 ₽» (full: «1 700 ₽ за торт»)
+  function dessertPrice(d, full) {
+    if (!d.price) return "";
+    const p = `${money(d.price)} ₽`;
+    if (d.unit === "шт") return `${p}/шт` + (d.minQty > 1 ? ` · от ${d.minQty} шт` : "");
+    if (d.unit === "кг") return `${p}/кг` + (d.minQty ? ` · от ${kg(d.minQty)} кг` : "");
+    return full && d.unit ? `${p} ${d.unit}` : p;
+  }
+
+  function optionsShort(d) {
+    const n = d.options.length;
+    if (!n) return "";
+    if (n <= 3) return `Начинки: ${d.options.map(lowerFirst).join(", ")}`;
+    return `${n} ${n % 10 === 1 && n % 100 !== 11 ? "начинка" : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "начинки" : "начинок"} на выбор`;
+  }
+
   function renderDesserts() {
     $("#desserts-list").replaceChildren(...D.desserts.map((d) =>
       el("article", { class: "card card--dessert", id: d.id, "data-item": d.id }, [
         placeholderPhoto("photo--square", dessertSrc(d), d.name, `Фото: ${d.name}`),
         el("h3", { class: "card__title", text: d.name }),
         el("p", { class: "card__desc", text: d.desc }),
-        d.price ? el("p", { class: "card__price" }, [el("strong", { text: `${money(d.price)} ₽` })]) : null,
+        d.options.length ? el("p", { class: "card__desc card__options", text: optionsShort(d) }) : null,
+        d.price ? el("p", { class: "card__price" }, [el("strong", { text: dessertPrice(d) })]) : null,
         el("div", { class: "card__actions" }, [
           el("button", { type: "button", class: "btn btn--outline btn--block",
             text: d.price ? "Заказать" : "Узнать цену",
@@ -376,7 +401,12 @@
     meta: $("#order-meta"),
     photo: $("#order-photo"),
     weightField: $("#order-weight-field"),
+    weightLabel: $("#weight-label"),
     weight: $("#order-weight"),
+    qtyField: $("#order-qty-field"),
+    qty: $("#order-qty"),
+    optionField: $("#order-option-field"),
+    option: $("#order-option"),
     dateBtn: $("#order-date-btn"),
     nearest: $("#order-nearest"),
     cal: $("#order-cal"),
@@ -389,6 +419,7 @@
   };
   let current = null;
   let weight = 2;
+  let qty = 1;
   let selectedDate = "";
   let opener = null;
   let manualShown = false;
@@ -460,23 +491,33 @@
   function openOrder(order, from) {
     current = order;
     opener = from || null;
-    weight = D.weight.default;
     manualShown = false;
     f.manual.hidden = true;
 
     const isFilling = order.type === "filling";
     const item = order.item;
+    weight = weightRange().min;
+    qty = item.minQty || 1;
     f.title.textContent = item.name;
     f.meta.textContent = isFilling
       ? `${item.category} · ${money(item.price)} ₽/кг`
-      : item.price ? `${money(item.price)} ₽` : "Цену подскажет Марина";
+      : item.price ? dessertPrice(item, true) : "Цену подскажет Марина";
+
+    // начинка на выбор (у десертов)
+    const opts = isFilling ? [] : item.options;
+    f.option.replaceChildren(el("option", { value: "", text: "Выберите начинку" }),
+      ...opts.map((o) => el("option", { value: o, text: o })));
+    f.optionField.hidden = !opts.length;
     f.photo.replaceChildren(
       isFilling
         ? fillingPhoto(item, "photo--round photo--sm")
         : placeholderPhoto("photo--round photo--sm", dessertSrc(item), item.name, "")
     );
-    f.weightField.hidden = !isFilling;
-    f.totalBox.hidden = !isFilling;
+    const byWeight = isFilling || item.unit === "кг";
+    f.weightField.hidden = !byWeight;
+    f.weightLabel.textContent = isFilling ? "Вес торта" : "Вес";
+    f.qtyField.hidden = isFilling || item.unit !== "шт";
+    f.totalBox.hidden = !(isFilling || (item.price && (item.unit === "шт" || item.unit === "кг")));
     f.send.href = D.contacts.telegram;
     toggleCalendar(false);
     updateWeight();
@@ -506,21 +547,47 @@
     if (e.key === "Escape" && dialog.hasAttribute("open") && !dialog.showModal) closeOrder();
   });
 
-  function updateWeight() {
+  // Вес: общий минимум из настроек; у категории (советская классика) и у десерта «на вес» — свой
+  function weightRange() {
     const W = D.weight;
+    if (!current) return W;
+    const item = current.item;
+    const min = current.type === "filling"
+      ? (item.cat && item.cat.minWeight) || W.min
+      : item.minQty || 1;
+    return { min, max: Math.max(W.max, min), step: W.step };
+  }
+
+  const QTY_MAX = 200;
+
+  function updateWeight() {
+    const W = weightRange();
     weight = Math.min(W.max, Math.max(W.min, weight));
     f.weight.textContent = `${kg(weight)} кг`;
     $$("[data-step]", dialog).forEach((b) => {
       b.disabled = b.dataset.step < 0 ? weight <= W.min : weight >= W.max;
     });
-    if (current && current.type === "filling") {
-      f.total.textContent = `${money(current.item.price * weight)} ₽`;
-    }
+    const minQ = (current && current.item.minQty) || 1;
+    qty = Math.min(QTY_MAX, Math.max(minQ, qty));
+    f.qty.textContent = `${qty} шт`;
+    $$("[data-qstep]", dialog).forEach((b) => {
+      b.disabled = b.dataset.qstep < 0 ? qty <= minQ : qty >= QTY_MAX;
+    });
+    if (!current) return;
+    const item = current.item;
+    if (current.type === "filling" || item.unit === "кг") f.total.textContent = `${money(item.price * weight)} ₽`;
+    else if (item.unit === "шт") f.total.textContent = `${money(item.price * qty)} ₽`;
   }
 
   $$("[data-step]", dialog).forEach((b) =>
     b.addEventListener("click", () => {
-      weight = Math.round((weight + Number(b.dataset.step) * D.weight.step) * 100) / 100;
+      weight = Math.round((weight + Number(b.dataset.step) * weightRange().step) * 100) / 100;
+      updateWeight();
+    })
+  );
+  $$("[data-qstep]", dialog).forEach((b) =>
+    b.addEventListener("click", () => {
+      qty += Number(b.dataset.qstep);
       updateWeight();
     })
   );
@@ -532,9 +599,16 @@
       lines.push(`Здравствуйте, Марина! Хочу заказать торт с начинкой «${item.name}» (${item.category.toLowerCase()}, ${money(item.price)} ₽/кг).`);
       lines.push(`Вес: примерно ${kg(weight)} кг`);
     } else if (item.price) {
-      lines.push(`Здравствуйте, Марина! Хочу заказать: ${lowerFirst(item.name)} (${money(item.price)} ₽). Подскажите, пожалуйста, свободные даты.`);
+      const price = item.unit === "шт" ? `${money(item.price)} ₽/шт` : item.unit === "кг" ? `${money(item.price)} ₽/кг`
+        : dessertPrice(item, true);
+      lines.push(`Здравствуйте, Марина! Хочу заказать: ${lowerFirst(item.name)} (${price}).`
+        + (selectedDate ? "" : " Подскажите, пожалуйста, свободные даты."));
+      if (f.option.value) lines.push(`Начинка: ${f.option.value}`);
+      if (item.unit === "шт") lines.push(`Количество: ${qty} шт`);
+      if (item.unit === "кг") lines.push(`Вес: примерно ${kg(weight)} кг`);
     } else {
       lines.push(`Здравствуйте, Марина! Интересует: ${lowerFirst(item.name)}. Подскажите, пожалуйста, цену и свободные даты.`);
+      if (f.option.value) lines.push(`Начинка: ${f.option.value}`);
     }
     if (selectedDate) lines.push(`Дата: ${Cal.human(selectedDate)}`);
     const wishes = f.wishes.value.trim().replace(/\s*\n\s*/g, "; ");

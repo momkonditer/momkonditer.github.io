@@ -4,7 +4,15 @@
   const API = (window.SITE && window.SITE.api) || "";
   const Cal = window.MiniCalendar;
   const AUTH_KEY = "mom_admin_auth";
-  const CATEGORIES = ["Стандарт", "Лайт", "Премиум"];
+  const CATEGORIES = ["Стандарт", "Лайт", "Премиум", "Советская классика"];
+  // Единица цены десерта: value — как пишется в таблице
+  const UNITS = [
+    { value: "шт", label: "за штуку" },
+    { value: "за торт", label: "за торт" },
+    { value: "за рулет", label: "за рулет" },
+    { value: "кг", label: "за кг" },
+    { value: "", label: "без подписи" },
+  ];
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const view = $("#view");
@@ -383,7 +391,10 @@
 
   function itemSub(kind, it) {
     if (kind === "fillings") return `${it.category} · ${money(it.price)} ₽ за кг`;
-    return it.price ? `${money(it.price)} ₽` : "Цена: «Узнать цену»";
+    if (!it.price) return "Цена: «Узнать цену»";
+    if (it.unit === "шт") return `${money(it.price)} ₽ за шт` + (it.minQty > 1 ? ` · от ${it.minQty} шт` : "");
+    if (it.unit === "кг") return `${money(it.price)} ₽ за кг` + (it.minQty ? ` · от ${it.minQty} кг` : "");
+    return `${money(it.price)} ₽` + (it.unit ? ` ${it.unit}` : "");
   }
 
   function renderItems(kind) {
@@ -518,12 +529,37 @@
           markDirty();
         } })));
 
+    // Десерт: за что цена, минимальный заказ, начинки на выбор
+    let unit = item ? item.unit || "" : "шт";
+    if (!isF && !UNITS.some((u) => u.value === unit)) UNITS.push({ value: unit, label: unit });
+    const unitGroup = el("div", { class: "segmented", role: "group", "aria-labelledby": "unit-label" },
+      (isF ? [] : UNITS).map((u) => el("button", { type: "button", class: "segmented__btn", "aria-pressed": String(u.value === unit), text: u.label,
+        onclick: (e) => {
+          unit = u.value;
+          unitGroup.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === e.currentTarget)));
+          minField.hidden = !(unit === "шт" || unit === "кг");
+          markDirty();
+        } })));
+    const minInput = el("input", { class: "input input--price", inputmode: "numeric", maxlength: "4",
+      value: item && item.minQty ? String(item.minQty) : "", oninput: markDirty });
+    const optionsInput = el("textarea", { class: "input", rows: "4", maxlength: "1500", oninput: markDirty });
+    optionsInput.value = item && item.options ? item.options.join("\n") : "";
+    const unitField = el("div", { class: "field" }, [
+      el("span", { class: "field__label", id: "unit-label", text: "Цена указана" }),
+      unitGroup,
+      el("p", { class: "field__hint", text: "«За штуку» — клиент выберет количество, «за кг» — вес." }),
+    ]);
+    const minField = field("Минимальный заказ", minInput, "Сколько штук (или кг) минимум. Например 4. Можно оставить пустым.", "f-min");
+    minField.hidden = !(unit === "шт" || unit === "кг");
+    const optionsField = field("Начинки на выбор", optionsInput,
+      "Каждая начинка с новой строки. Клиент выберет одну из списка при заказе.", "f-options");
+
     const nameField = field("Название", nameInput, isF ? "Как начинка будет называться на сайте." : "Как десерт будет называться на сайте.", "f-name");
     const priceField = field(isF ? "Цена за 1 кг, ₽" : "Цена, ₽", priceInput,
       isF ? "Только цифры, например 2500." : "Оставьте пустым — на сайте будет кнопка «Узнать цену».", "f-price");
     const descField = field(isF ? "Состав" : "Описание", descInput,
       isF ? "Одной строкой: из чего начинка. Например: шоколадный бисквит, карамель, арахис."
-        : "Коротко: что это и какие бывают начинки.", "f-desc");
+        : "Коротко: что это, вес или размер. Например: маленький торт, около 500 г.", "f-desc");
 
     const saveBtn = el("button", { type: "button", class: "btn btn--primary btn--big btn--block", text: isNew ? "Добавить на сайт" : "Сохранить" });
     const saveMsg = el("p", { class: "form-msg", role: "alert" });
@@ -534,13 +570,18 @@
       setFieldError(nameField, name ? "" : MSG.name_required);
       const priceBad = isF ? !(price > 0) : price !== null && !(price > 0);
       setFieldError(priceField, priceBad ? (isF ? MSG.price_required : "Напишите цену цифрами или оставьте поле пустым.") : "");
-      if (!name || priceBad) {
-        (name ? priceInput : nameInput).focus();
+      const minQty = isF || minField.hidden ? null : parseNum(minInput.value);
+      const minBad = minQty !== null && !(minQty >= 1 && minQty <= 1000 && Number.isInteger(minQty));
+      if (!isF) setFieldError(minField, minBad ? "Напишите целое число, например 4, или оставьте поле пустым." : "");
+      if (!name || priceBad || minBad) {
+        (!name ? nameInput : priceBad ? priceInput : minInput).focus();
         return;
       }
       const payload = {
         kind,
-        item: { id: item ? item.id : "", name, price: price || "", desc: descInput.value.trim(), category: isF ? category : undefined },
+        item: { id: item ? item.id : "", name, price: price || "", desc: descInput.value.trim(), category: isF ? category : undefined,
+          unit: isF ? undefined : unit, minQty: isF ? undefined : (minQty || ""),
+          options: isF ? undefined : optionsInput.value.split("\n").map((s) => s.trim()).filter(Boolean) },
         photo: photoData || undefined,
       };
       const ok = await runSave(saveBtn, saveMsg, async () => {
@@ -644,7 +685,10 @@
           el("p", { class: "field__hint", text: "В какой группе начинка стоит на сайте." }),
         ]) : null,
         priceField,
+        isF ? null : unitField,
+        isF ? null : minField,
         descField,
+        isF ? null : optionsField,
         manage,
       ]),
       el("div", { class: "editor__foot" }, [saveBtn, saveMsg])

@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
   <a class="skip-link" href="#fillings">К начинкам</a>
@@ -80,7 +80,7 @@
     <section class="section section--tinted" id="desserts" aria-labelledby="desserts-title">
       <div class="container">
         <h2 class="section__title" id="desserts-title">Десерты</h2>
-        <p class="section__lead">Цены уточняйте у Марины — нажмите «Узнать цену».</p>
+        <p class="section__lead">Выберите десерт и нажмите «Заказать» — заявка соберётся сама.</p>
         <div class="grid grid--desserts" id="desserts-list"></div>
       </div>
     </section>
@@ -195,12 +195,26 @@
         </div>
       </div>
 
+      <label class="field" id="order-option-field" hidden>
+        <span class="field__label">Начинка</span>
+        <select id="order-option" class="input select"></select>
+      </label>
+
       <div class="field" id="order-weight-field">
         <span class="field__label" id="weight-label">Вес торта</span>
         <div class="stepper" role="group" aria-labelledby="weight-label">
           <button type="button" class="stepper__btn" data-step="-1" aria-label="Уменьшить вес">−</button>
           <output class="stepper__value" id="order-weight" aria-live="polite"></output>
           <button type="button" class="stepper__btn" data-step="1" aria-label="Увеличить вес">+</button>
+        </div>
+      </div>
+
+      <div class="field" id="order-qty-field" hidden>
+        <span class="field__label" id="qty-label">Количество</span>
+        <div class="stepper" role="group" aria-labelledby="qty-label">
+          <button type="button" class="stepper__btn" data-qstep="-1" aria-label="Меньше">−</button>
+          <output class="stepper__value" id="order-qty" aria-live="polite"></output>
+          <button type="button" class="stepper__btn" data-qstep="1" aria-label="Больше">+</button>
         </div>
       </div>
 
@@ -234,8 +248,8 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=3"></script>
+  <script src="data.js?v=4"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>
