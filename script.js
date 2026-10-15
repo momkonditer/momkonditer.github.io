@@ -376,15 +376,22 @@
     const gl = $("#gallery-list");
     const works = SITE.gallery.map((w, i) => {
       const file = typeof w === "string" ? w : w.file;
-      const caption = (typeof w === "string" ? "" : w.caption) || `Работа ${i + 1}`;
-      return { src: `images/gallery/${file}?v=${encodeURIComponent(SITE.photoVersion || 1)}`, caption };
+      const caption = (typeof w === "string" ? "" : w.title || w.caption) || `Работа ${i + 1}`;
+      const text = (typeof w === "string" ? "" : w.text) || "";
+      return { src: `images/gallery/${file}?v=${encodeURIComponent(SITE.photoVersion || 1)}`, caption, text };
     });
     works.forEach((w, i) => {
       const btn = el("button", { type: "button", class: "work", "aria-label": `Открыть фото: ${w.caption}` }, [
         placeholderPhoto("photo--work", w.src, w.caption, `Фото работы ${pad(i + 1)}`),
       ]);
       btn.addEventListener("click", () => openLightbox(works, i, btn));
-      gl.append(btn);
+      gl.append(el("figure", { class: "work-card" }, [
+        btn,
+        el("figcaption", { class: "work-card__caption" }, [
+          el("h3", { class: "work-card__title", text: w.caption }),
+          w.text ? el("p", { class: "work-card__text", text: w.text }) : null,
+        ].filter(Boolean)),
+      ]));
     });
 
     const rl = $("#reviews-list");
@@ -419,6 +426,8 @@
     img.src = w.src;
     img.alt = w.caption;
     $(".lightbox__caption", lb).textContent = w.caption;
+    $(".lightbox__text", lb).textContent = w.text || "";
+    $(".lightbox__text", lb).hidden = !w.text;
     $(".lightbox__count", lb).textContent = `${lbIndex + 1} / ${lbItems.length}`;
     $$(".lightbox__nav", lb).forEach((b) => (b.hidden = lbItems.length < 2));
   }
