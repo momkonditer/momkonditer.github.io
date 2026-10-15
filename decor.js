@@ -147,4 +147,37 @@
       schedule();
     }).observe(main, { childList: true, subtree: true });
   }
+  /* ---------- Волнистое подчёркивание акцентных слов («выдавлено кондитерским мешком») ---------- */
+  if (on("handUnderline")) {
+    const NS = "http://www.w3.org/2000/svg";
+    // неровная волна: шаг и высота чуть гуляют, как у крема из мешка
+    const WAVE = "M2 11 C 14 4, 22 4, 33 10 S 52 17, 64 10 S 84 3, 97 9 S 117 16, 129 10 S 150 4, 162 9 S 183 15, 198 8";
+    const words = $$(".hero__script, .decor-script");
+    words.forEach((w) => {
+      if (w.querySelector(".decor-underline")) return;
+      const svg = document.createElementNS(NS, "svg");
+      svg.setAttribute("class", "decor-underline");
+      svg.setAttribute("viewBox", "0 0 200 20");
+      svg.setAttribute("preserveAspectRatio", "none");
+      svg.setAttribute("aria-hidden", "true");
+      svg.setAttribute("focusable", "false");
+      const path = document.createElementNS(NS, "path");
+      path.setAttribute("d", WAVE);
+      path.setAttribute("pathLength", "1");
+      svg.append(path);
+      w.classList.add("decor-underlined");
+      w.append(svg);
+    });
+    const draw = (w) => w.classList.add("is-drawn");
+    if (reduce || !("IntersectionObserver" in window)) {
+      words.forEach(draw);
+    } else {
+      const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        draw(e.target);
+        io.unobserve(e.target);
+      }), { rootMargin: "0px 0px -10% 0px" });
+      words.forEach((w) => io.observe(w));
+    }
+  }
 })();
