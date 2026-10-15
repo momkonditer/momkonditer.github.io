@@ -37,6 +37,17 @@
 
   const main = $("main");
   const hero = $(".hero");
+  /* ---------- Бегущая строка под первым экраном ---------- */
+  if (on("marquee") && hero) {
+    const TEXT = "натуральные сливки · без маргарина · торты от 2 кг · доставка по Электростали · каждый торт под заказ · 20+ начинок · ";
+    // строка повторена, чтобы лента была длиннее любого экрана; вторая половина — копия для бесшовного круга
+    const half = () => el("span", { class: "decor-marquee__half" }, [TEXT.repeat(3)]);
+    const copy = half();
+    copy.setAttribute("aria-hidden", "true");
+    hero.after(el("div", { class: "decor-marquee", role: "note", "aria-label": TEXT.replace(/ · $/, "") }, [
+      el("div", { class: "decor-marquee__track", "aria-hidden": "true" }, [half(), copy]),
+    ]));
+  }
   /* ---------- Кремовые бордюры между секциями ---------- */
   if (on("lambethDividers") && main) {
     // между секциями: пропускаем первый экран и первую секцию после него (там бегущая строка)

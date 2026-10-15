@@ -12,3 +12,20 @@
   pointer-events: none;
 }
 .decor-divider--beads { background-image: url("images/decor/beads.svg?v=1"); }
+
+/* ===== Бегущая строка ===== */
+.decor-marquee {
+  overflow: hidden; padding: 11px 0;
+  background: var(--paper);
+  border-block: 1px solid rgba(154, 76, 88, 0.18);
+}
+.decor-marquee__track { display: flex; width: max-content; animation: decor-marquee 90s linear infinite; }
+.decor-marquee:hover .decor-marquee__track { animation-play-state: paused; }
+.decor-marquee__half {
+  flex: none; white-space: nowrap; padding-right: 0.5em;
+  font-family: var(--font-head); font-size: 16px; letter-spacing: 0.04em; color: var(--rose-ink);
+}
+@keyframes decor-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .decor-marquee__track { animation: none; }
+}
