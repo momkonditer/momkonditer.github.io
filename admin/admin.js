@@ -66,6 +66,7 @@
     photo_open: "Это фото не получилось загрузить. Попробуйте сделать скриншот фото и загрузить его",
     not_found: "Этого товара уже нет. Обновите страницу.",
     hide_first: "Сначала скройте товар с сайта — потом его можно удалить.",
+    text_required: "Напишите текст отзыва.",
   };
 
   class UserError extends Error {}
@@ -297,6 +298,7 @@
       "": renderHome,
       fillings: () => renderItems("fillings"),
       desserts: () => renderItems("desserts"),
+      reviews: renderReviews,
       dates: renderDates,
       settings: renderSettings,
     };
@@ -369,6 +371,7 @@
       el("nav", { class: "tiles" }, [
         tile("#/fillings", "🎂", "Начинки и цены", "Цены, составы, фото разрезов"),
         tile("#/desserts", "🧁", "Десерты", "Бенто, капкейки и другое"),
+        tile("#/reviews", "💬", "Отзывы", "Добавить, поправить, скрыть"),
         tile("#/dates", "📅", "Занятые даты", "Когда заказы не принимаются"),
         tile("#/settings", "🎁", "Акции и контакты", "Подарки, телефон, адрес"),
       ]),
@@ -702,6 +705,162 @@
   function closeEditor() {
     if (editor.open) editor.close();
     document.body.append(toastEl);
+  }
+
+  /* ================= Отзывы ================= */
+
+  const REVIEW_NAME = "Покупательница";
+  const fillingName = (id) => {
+    const f = id && state.data.fillings.find((x) => x.id === id);
+    return f ? f.name : id || "";
+  };
+
+  function renderReviews() {
+    setTitle("Отзывы");
+    withData(() => {
+      const items = state.data.reviews || [];
+      view.replaceChildren(
+        el("button", { type: "button", class: "btn btn--primary btn--big btn--block", text: "+ Добавить отзыв",
+          onclick: () => openReviewEditor(null) }),
+        el("p", { class: "hint", text: "Нажмите на отзыв, чтобы поправить текст, имя или начинку. На сайте они идут в том же порядке." }),
+        items.length
+          ? el("div", { class: "items" }, items.map((it) =>
+            el("button", { type: "button", class: "item" + (it.visible ? "" : " is-hidden"), onclick: () => openReviewEditor(it) }, [
+              el("div", { class: "thumb" }, [el("span", { class: "thumb__letter", text: "💬" })]),
+              el("span", { class: "item__body" }, [
+                el("strong", { class: "item__name", text: it.name }),
+                el("span", { class: "item__sub", text: it.text.length > 70 ? it.text.slice(0, 68).trim() + "…" : it.text }),
+                it.filling ? el("span", { class: "item__sub", text: "Начинка: " + fillingName(it.filling) }) : null,
+                it.visible ? null : el("span", { class: "badge", text: "Скрыто с сайта" }),
+              ]),
+              el("span", { class: "item__arrow", "aria-hidden": "true", text: "›" }),
+            ])))
+          : el("p", { class: "empty", text: "Пока пусто. Нажмите «Добавить отзыв»." })
+      );
+    });
+  }
+
+  function openReviewEditor(item) {
+    const isNew = !item;
+    let dirty = false;
+    const markDirty = () => (dirty = true);
+    if (!state.data.reviews) state.data.reviews = [];
+
+    const nameInput = el("input", { class: "input", value: item ? item.name : "", maxlength: "40", autocapitalize: "words",
+      placeholder: REVIEW_NAME, oninput: markDirty });
+    const textInput = el("textarea", { class: "input", rows: "6", maxlength: "1000", oninput: markDirty });
+    textInput.value = item ? item.text : "";
+    const fillingSelect = el("select", { class: "input", onchange: markDirty }, [
+      el("option", { value: "", text: "Не указана" }),
+      ...state.data.fillings.map((f) => el("option", { value: f.id, text: f.name + (f.visible ? "" : " (скрыта)") })),
+    ]);
+    if (item && item.filling && !state.data.fillings.some((f) => f.id === item.filling)) {
+      fillingSelect.append(el("option", { value: item.filling, text: item.filling + " (нет на сайте)" }));
+    }
+    fillingSelect.value = item ? item.filling || "" : "";
+
+    const nameField = field("Имя", nameInput, `Например: Ирина. Оставите пустым — будет «${REVIEW_NAME}».`, "r-name");
+    const textField = field("Текст отзыва", textInput, "Как написал клиент, без изменений.", "r-text");
+    const fillingField = field("Начинка", fillingSelect,
+      "Если в отзыве хвалят начинку — выберите её: под отзывом будет кнопка, которая покажет эту начинку на сайте.", "r-filling");
+
+    const saveBtn = el("button", { type: "button", class: "btn btn--primary btn--big btn--block", text: isNew ? "Добавить на сайт" : "Сохранить" });
+    const saveMsg = el("p", { class: "form-msg", role: "alert" });
+    saveBtn.addEventListener("click", async () => {
+      const text = textInput.value.trim();
+      setFieldError(textField, text ? "" : MSG.text_required);
+      if (!text) { textInput.focus(); return; }
+      const payload = { kind: "reviews",
+        item: { id: item ? item.id : "", name: nameInput.value.trim(), text, filling: fillingSelect.value } };
+      const ok = await runSave(saveBtn, saveMsg, async () => {
+        const res = await api("saveItem", payload);
+        const list = state.data.reviews;
+        const i = list.findIndex((x) => x.id === res.item.id);
+        if (i >= 0) list[i] = res.item;
+        else list.push(res.item);
+        item = res.item;
+        dirty = false;
+      });
+      if (ok) {
+        setTimeout(() => {
+          closeEditor(true);
+          toast(isNew ? "Добавлено на сайт ✓" : "Сохранено ✓");
+          renderReviews();
+        }, 900);
+      }
+    });
+
+    // Скрыть / вернуть / удалить
+    const manage = el("div", { class: "manage" });
+    function renderManage() {
+      if (isNew) return;
+      const msg = el("p", { class: "form-msg", role: "alert" });
+      const toggle = el("button", { type: "button", class: "btn btn--ghost btn--block",
+        text: item.visible ? "Скрыть с сайта" : "Вернуть на сайт" });
+      toggle.addEventListener("click", async () => {
+        const visible = !item.visible;
+        const ok = await runSave(toggle, msg, async () => {
+          const res = await api("setVisible", { kind: "reviews", id: item.id, visible });
+          const list = state.data.reviews;
+          list[list.findIndex((x) => x.id === item.id)] = res.item;
+          item = res.item;
+        });
+        if (ok) {
+          toast(visible ? "Снова на сайте ✓" : "Скрыто с сайта ✓");
+          renderManage();
+        }
+      });
+      const parts = [
+        el("h3", { class: "manage__title", text: item.visible ? "Убрать с сайта" : "Отзыв скрыт с сайта" }),
+        el("p", { class: "field__hint", text: item.visible
+          ? "Отзыв пропадёт с сайта, но останется здесь — его можно будет вернуть."
+          : "Покупатели его не видят. Можно вернуть на сайт или удалить совсем." }),
+        toggle,
+      ];
+      if (!item.visible) {
+        const del = el("button", { type: "button", class: "btn btn--danger-ghost btn--block", text: "Удалить навсегда" });
+        del.addEventListener("click", async () => {
+          if (!(await ask(`Удалить отзыв «${item.name}» навсегда? Вернуть будет нельзя.`, "Да, удалить", "Отмена", true))) return;
+          del.disabled = true;
+          del.textContent = "Удаляю…";
+          try {
+            await api("deleteItem", { kind: "reviews", id: item.id });
+            state.data.reviews = state.data.reviews.filter((x) => x.id !== item.id);
+            closeEditor(true);
+            toast("Удалено");
+            renderReviews();
+          } catch (e) {
+            del.disabled = false;
+            del.textContent = "Удалить навсегда";
+            msg.textContent = errorText(e);
+            msg.className = "form-msg is-error";
+          }
+        });
+        parts.push(del);
+      }
+      parts.push(msg);
+      manage.replaceChildren(...parts);
+    }
+    renderManage();
+
+    async function tryClose() {
+      if (dirty && !(await ask("Закрыть без сохранения? Изменения пропадут.", "Закрыть", "Остаться"))) return;
+      closeEditor(true);
+      renderReviews();  // скрыли или вернули отзыв — обновить список
+    }
+
+    editor.replaceChildren(
+      el("div", { class: "editor__head" }, [
+        el("h2", { class: "editor__title", id: "editor-title", text: isNew ? "Новый отзыв" : "Отзыв: " + item.name }),
+        el("button", { type: "button", class: "editor__close", "aria-label": "Закрыть", text: "×", onclick: tryClose }),
+      ]),
+      el("div", { class: "editor__body" }, [nameField, textField, fillingField, manage]),
+      el("div", { class: "editor__foot" }, [saveBtn, saveMsg])
+    );
+    editor.oncancel = (e) => { e.preventDefault(); tryClose(); };
+    editor.showModal();
+    editor.scrollTop = 0;
+    if (isNew && !("ontouchstart" in window)) textInput.focus();
   }
 
   // Сжимаем фото в браузере до ~1200px — быстрее загружается и не забивает Диск

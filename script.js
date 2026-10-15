@@ -99,6 +99,11 @@
     });
     fillings.forEach((f) => (f.cat = categories.find((c) => c.name === f.category)));
 
+    const reviews = (Array.isArray(raw && raw.reviews) ? raw.reviews : fb.reviews || [])
+      .filter((r) => r && String(r.text || "").trim())
+      .map((r) => ({ id: String(r.id || ""), name: String(r.name || "").trim() || "Покупательница",
+        text: String(r.text).trim(), filling: String(r.filling || "").trim() }));
+
     const isoRe = /^\d{4}-\d{2}-\d{2}$/;
     const busy = (Array.isArray(raw && raw.busy) ? raw.busy : fb.busy)
       .filter((r) => r && isoRe.test(r.from))
@@ -117,6 +122,7 @@
           .map((o) => String(o).trim()).filter(Boolean),
       })),
       busy,
+      reviews,
       prepayment: Number(s.prepayment) >= 0 ? Number(s.prepayment) : 50,
       cancelDays: Number(s.cancelDays) >= 0 ? Math.floor(Number(s.cancelDays)) : 2,
       minDaysAhead: Math.max(0, Math.floor(Number(s.minDaysAhead) || 0)),
@@ -371,6 +377,47 @@
     $("#desserts").hidden = !D.desserts.length;
   }
 
+  /* ================= Отзывы: лента сообщений ================= */
+  const REVIEWS_SHOWN = 5;  // на телефоне сначала столько, остальные — по кнопке «Ещё отзывы»
+  let reviewsOpen = false;
+
+  function renderReviews() {
+    const list = $("#reviews-list");
+    const more = $("#reviews-more");
+    $("#reviews").hidden = !D.reviews.length;
+    list.replaceChildren(...D.reviews.map((r, i) => {
+      const f = r.filling && D.fillings.find((x) => x.id === r.filling);
+      return el("figure", { class: "review" + (i >= REVIEWS_SHOWN ? " review--extra" : "") }, [
+        el("figcaption", { class: "review__name", text: r.name }),
+        el("blockquote", { class: "review__bubble" }, [
+          el("p", { class: "review__text", text: r.text }),
+          el("p", { class: "review__meta" }, [
+            el("span", { text: "отзыв в Instagram" }),
+            el("span", { class: "review__ticks", "aria-hidden": "true", text: "✓✓" }),
+          ]),
+        ]),
+        f ? el("a", { class: "review__tag", href: `#${f.id}`, text: f.name,
+          "aria-label": `Начинка «${f.name}» — показать в меню`,
+          onclick: (e) => {
+            e.preventDefault();
+            if (location.hash !== "#" + f.id) history.pushState(null, "", "#" + f.id);
+            handleHash();
+          } }) : null,
+      ]);
+    }));
+    const extra = D.reviews.length > REVIEWS_SHOWN;
+    list.classList.toggle("is-open", reviewsOpen || !extra);
+    more.hidden = reviewsOpen || !extra;
+  }
+
+  $("#reviews-more").addEventListener("click", () => {
+    reviewsOpen = true;
+    renderReviews();
+    // фокус на первый открывшийся отзыв — чтобы клавиатура и скринридер не потерялись
+    const first = $("#reviews-list .review--extra");
+    if (first) { first.tabIndex = -1; first.focus({ preventScroll: true }); }
+  });
+
   /* ================= Галерея, отзывы, фото страницы (один раз) ================= */
   function renderStatic() {
     const gl = $("#gallery-list");
@@ -392,19 +439,6 @@
           w.text ? el("p", { class: "work-card__text", text: w.text }) : null,
         ].filter(Boolean)),
       ]));
-    });
-
-    const rl = $("#reviews-list");
-    SITE.reviews.forEach((file, i) => {
-      const src = `images/reviews/${file}`;
-      rl.append(
-        placeholderPhoto("photo--story", src, `Скриншот отзыва ${i + 1}`, "Здесь будет скриншот отзыва", (img) => {
-          // Скриншот можно открыть крупно
-          const a = el("a", { href: src, target: "_blank", rel: "noopener", "aria-label": `Открыть отзыв ${i + 1}` });
-          img.replaceWith(a);
-          a.append(img);
-        })
-      );
     });
 
     $$(".photo[data-src]").forEach((box) => {
@@ -760,6 +794,7 @@
     renderInfo();
     renderFillings();
     renderDesserts();
+    renderReviews();
     if (dialog.open) {
       // данные обновились, пока окно открыто: цена и занятые даты могли поменяться
       if (current && current.type === "filling") {

@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="styles.css?v=13">
 </head>
 <body>
   <a class="skip-link" href="#fillings">К начинкам</a>
@@ -143,12 +143,12 @@
       </div>
     </section>
 
-    <!-- Отзывы: только реальные скриншоты из хайлайта «Отзывы» -->
+    <!-- Отзывы: настоящие тексты клиентов (лист «Отзывы» в таблице) -->
     <section class="section" id="reviews" aria-labelledby="reviews-title">
       <div class="container">
         <h2 class="section__title" id="reviews-title">Отзывы</h2>
-        <p class="section__lead">Скриншоты отзывов от клиентов.</p>
-        <div class="grid grid--reviews" id="reviews-list"></div>
+        <div class="chat" id="reviews-list"></div>
+        <button type="button" class="btn btn--outline chat__more" id="reviews-more" hidden>Ещё отзывы</button>
       </div>
     </section>
 
@@ -276,8 +276,8 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=12"></script>
+  <script src="data.js?v=13"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=11"></script>
 </body>
 </html>

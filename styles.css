@@ -208,7 +208,6 @@ button { font: inherit; color: inherit; }
 .photo--layers.has-photo { box-shadow: 0 4px 14px rgba(74, 48, 39, 0.12); }
 .photo--sm { width: 72px; max-width: 72px; margin: 0; flex: none; }
 .photo--square { aspect-ratio: 1; }
-.photo--story { aspect-ratio: 9 / 16; }
 .photo--hero { aspect-ratio: 4 / 5; border-radius: 28px; max-width: 520px; margin-inline: auto; width: 100%; }
 .photo--hero img { object-position: center 30%; }
 .photo--work { aspect-ratio: 4 / 5; width: 100%; }
@@ -341,7 +340,38 @@ button { font: inherit; color: inherit; }
 .features strong { display: block; color: var(--ink); }
 
 /* ===== Галерея и отзывы ===== */
-.grid--gallery, .grid--reviews { margin-top: 24px; }
+.grid--gallery { margin-top: 24px; }
+
+/* ===== Отзывы: лента чата ===== */
+.chat { margin-top: 24px; }
+.review { margin: 0 0 20px; padding-right: 12%; break-inside: avoid; }
+.review:nth-child(even) { padding-right: 0; padding-left: 9%; }
+.chat:not(.is-open) .review--extra { display: none; }
+.review__name { margin: 0 0 4px 14px; font-size: 13px; font-weight: 500; color: var(--rose-ink); }
+.review__bubble {
+  position: relative; margin: 0 0 0 7px; padding: 12px 14px 8px;
+  background: var(--rose-soft); border-radius: 20px 20px 20px 6px;
+}
+/* хвостик сообщения слева внизу */
+.review__bubble::before {
+  content: ""; position: absolute; left: -7px; bottom: 0;
+  width: 14px; height: 14px; background: inherit;
+  clip-path: path("M14 0 V14 H0 C6 12 11 8 14 0 Z");
+}
+.review__text { font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.review__meta {
+  display: flex; justify-content: flex-end; align-items: center; gap: 4px; margin-top: 4px;
+  font-size: 11px; font-weight: 300; color: var(--muted);
+}
+.review__ticks { color: var(--rose-ink); font-size: 12px; letter-spacing: -0.2em; padding-right: 0.2em; }
+.review__tag {
+  display: inline-flex; align-items: center; min-height: 40px; margin: 8px 0 0 14px; padding: 8px 14px;
+  border: 1px solid var(--ink); border-radius: 999px;
+  font-size: 13px; line-height: 1.2; color: var(--ink); text-decoration: none;
+}
+.review__tag::after { content: "→"; margin-left: 6px; }
+.review__tag:hover { background: rgba(42, 32, 28, 0.06); }
+.chat__more { display: flex; margin: 4px auto 0; }
 .grid--gallery { row-gap: 24px; }
 
 /* ===== Контакты ===== */
@@ -487,7 +517,9 @@ textarea.input { resize: vertical; }
   .hero__actions, .contacts__actions { flex-direction: row; flex-wrap: wrap; }
   .grid { gap: 16px; }
   .grid--fillings, .grid--desserts, .grid--gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .grid--reviews { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .chat { columns: 2; column-gap: 32px; }
+  .chat:not(.is-open) .review--extra { display: block; }
+  .chat__more { display: none; }
   .card { padding: 18px 16px 10px; }
   .card--filling .photo--round { width: min(100%, calc((100% + 32px) * 0.88)); }
   .steps { grid-template-columns: repeat(2, 1fr); }
@@ -514,7 +546,7 @@ textarea.input { resize: vertical; }
   .hero__subtitle { font-size: 26px; }
 
   .grid--fillings { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .grid--gallery, .grid--reviews { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid--gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .card__title { font-size: 20px; }
   .card__desc { font-size: 14px; }
 
