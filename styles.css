@@ -213,7 +213,7 @@ button { font: inherit; color: inherit; }
   .hero__content { padding-bottom: 64px; }
 }
 /* планшет: фото уже, текст заходит на жакет и торт — добавляем затемнение снизу */
-@media (min-width: 701px) and (max-width: 1100px) {
+@media (min-width: 701px) and (max-width: 900px) {
   .hero__shade {
     background:
       linear-gradient(to top, rgba(28, 18, 16, 0.72) 0%, rgba(28, 18, 16, 0.45) 35%, rgba(28, 18, 16, 0) 60%),
@@ -223,7 +223,7 @@ button { font: inherit; color: inherit; }
 
 /* ===== Полоса фактов под фото ===== */
 .facts { background: var(--paper); border-bottom: 1px solid var(--line); }
-.facts__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding-block: 6px; }
+.facts__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-block: 0; padding-block: 6px; }
 .fact {
   display: grid; gap: 4px; align-content: center; justify-items: center; min-width: 0;
   padding: 16px 8px; text-align: center;
@@ -645,4 +645,34 @@ textarea.input { resize: vertical; }
   .footer__inner { grid-template-columns: auto 1fr; align-items: center; column-gap: 32px; }
   .footer__inner p:first-of-type { justify-self: end; }
   .footer__small { grid-column: 1 / -1; }
+}
+
+/* ===== Первый экран на компьютере (шире 900px): ровный фон + фото справа целиком =====
+   Фон — цвет студийного фона самой фотографии (замерен по левому краю фото: #837e7b сверху, #66615f снизу),
+   чуть светлее к центру. Фото не растягивается: высота = высота экрана, ширина — по пропорциям (1308×1748),
+   левый край растворяется в фоне. Правый край фото темнее фона, поэтому фото прижато к краю экрана. */
+@media (min-width: 901px) {
+  .hero__stage {
+    --hero-h: clamp(600px, 88vh, 820px);
+    --photo-w: calc(var(--hero-h) * 0.7483);
+    height: var(--hero-h); min-height: 0;
+    align-items: center;
+    background:
+      radial-gradient(ellipse 55% 80% at 60% 42%, #86817e 0%, rgba(134, 129, 126, 0) 100%),
+      linear-gradient(to bottom, #77726f 0%, #6f6a68 55%, #625d5b 100%);
+  }
+  .hero__photo {
+    inset: 0 0 0 auto; width: var(--photo-w); height: 100%;
+    object-fit: cover; object-position: 50% 50%;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 25%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 25%);
+  }
+  .hero__shade { background: none; }
+  .hero__content { padding-top: var(--header-h); padding-bottom: 0; }
+  /* текст не заходит на фото: ширина до 560px, но не дальше левого края фото (минус отступ) */
+  .hero__content > * {
+    max-width: min(560px, calc(100vw - var(--photo-w) - max(16px, (100vw - 1160px) / 2 + 16px) - 40px));
+  }
+  .hero__title { font-size: clamp(42px, 4.4vw, 64px); }
+  .hero__actions { flex-wrap: wrap; }
 }
