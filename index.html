@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
   <a class="skip-link" href="#fillings">К начинкам</a>
@@ -61,7 +61,7 @@
           <p class="gift" id="hero-gift"><span class="gift__icon" aria-hidden="true">🎁</span><span class="gift__text"></span></p>
         </div>
         <div class="hero__media">
-          <div class="photo photo--hero" data-src="images/hero.jpg" data-alt="Торт MOM кондитер" data-label="Фото торта"></div>
+          <div class="photo photo--hero" data-src="images/marina-hero.jpg" data-alt="Кондитер Марина с тортом" data-label="Фото Марины"></div>
         </div>
       </div>
     </section>
@@ -91,7 +91,7 @@
         <h2 class="section__title" id="how-title">Как заказать</h2>
         <ol class="steps">
           <li class="step"><span class="step__num">1</span><h3>Выберите начинку</h3><p>Посмотрите разрезы и нажмите «Заказать» на понравившейся.</p></li>
-          <li class="step"><span class="step__num">2</span><h3>Отправьте заявку в Telegram</h3><p>Текст заявки скопируется сам — останется вставить его в чат.</p></li>
+          <li class="step"><span class="step__num">2</span><h3>Отправьте заявку в Telegram</h3><p>Укажите дату и время, вес, начинку, декор, доставку или самовывоз. Текст заявки скопируется сам — останется вставить его в чат.</p></li>
           <li class="step"><span class="step__num">3</span><h3>Согласуйте дизайн</h3><p>Обсудим декор и детали, затем вносится предоплата <span data-setting="prepayment">50</span>%.</p></li>
           <li class="step"><span class="step__num">4</span><h3>Заберите торт</h3><p>Самовывоз или доставка по Электростали.</p></li>
         </ol>
@@ -226,6 +226,19 @@
       </div>
 
       <label class="field">
+        <span class="field__label">Время <span class="field__opt">(необязательно)</span></span>
+        <input id="order-time" class="input" type="text" maxlength="40" autocomplete="off" placeholder="Например: к 15:00">
+      </label>
+
+      <fieldset class="field field--plain">
+        <legend class="field__label">Доставка или самовывоз</legend>
+        <div class="seg">
+          <label class="seg__item"><input type="radio" name="order-receive" value="Доставка"><span>Доставка</span></label>
+          <label class="seg__item"><input type="radio" name="order-receive" value="Самовывоз"><span>Самовывоз</span></label>
+        </div>
+      </fieldset>
+
+      <label class="field">
         <span class="field__label">Пожелания по декору <span class="field__opt">(необязательно)</span></span>
         <textarea id="order-wishes" class="input" rows="3" placeholder="Например: надпись «С днём рождения», ягоды сверху"></textarea>
       </label>
@@ -248,8 +261,8 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=7"></script>
+  <script src="data.js?v=8"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=7"></script>
+  <script src="script.js?v=8"></script>
 </body>
 </html>

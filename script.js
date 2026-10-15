@@ -257,7 +257,8 @@
     gift.hidden = !D.settings.promoFirstShort;
     $(".gift__text", gift).textContent = D.settings.promoFirstShort || "";
 
-    const terms = [`Предоплата ${D.prepayment}% от стоимости — обязательна для всех заказов.`]
+    const terms = ["Оптимально заказывать за 2–3 недели до события (свадебные торты — заранее, уточняйте). При возможности возьму заказ даже за 2–3 дня.",
+      `Предоплата ${D.prepayment}% от стоимости — обязательна для всех заказов.`]
       .concat(D.cancelDays > 0
         ? `При отказе позже чем за ${D.cancelDays} ${daysWord(D.cancelDays)} до выдачи предоплата не возвращается.`
         : "При отказе в день выдачи предоплата не возвращается.")
@@ -392,7 +393,7 @@
 
     $$(".photo[data-src]").forEach((box) => {
       box.append(el("span", { class: "photo__label", text: box.dataset.label }));
-      attachPhoto(box, box.dataset.src, box.dataset.alt);
+      attachPhoto(box, `${box.dataset.src}?v=${encodeURIComponent(SITE.photoVersion || 1)}`, box.dataset.alt);
     });
   }
 
@@ -412,6 +413,7 @@
     nearest: $("#order-nearest"),
     cal: $("#order-cal"),
     wishes: $("#order-wishes"),
+    time: $("#order-time"),
     totalBox: $("#order-total-box"),
     total: $("#order-total"),
     send: $("#order-send"),
@@ -612,6 +614,10 @@
       if (f.option.value) lines.push(`Начинка: ${f.option.value}`);
     }
     if (selectedDate) lines.push(`Дата: ${Cal.human(selectedDate)}`);
+    const time = f.time.value.trim();
+    if (time) lines.push(`Время: ${time}`);
+    const receive = $('input[name="order-receive"]:checked', dialog);
+    if (receive) lines.push(`Получение: ${receive.value.toLowerCase()}`);
     const wishes = f.wishes.value.trim().replace(/\s*\n\s*/g, "; ");
     if (wishes) lines.push(`Пожелания: ${wishes}`);
     return lines.join("\n");
