@@ -9,10 +9,11 @@
 
   const D = (window.SITE && window.SITE.decor) || {};
   const on = (k) => D[k] === true;
-  const KEYS = ["lambethDividers", "marquee", "marble", "lineArt", "stats", "scriptAccents", "revealAnimation"];
+  const KEYS = ["lambethDividers", "marquee", "marble", "lineArt", "stats", "scriptAccents", "revealAnimation",
+    "priceTags", "handUnderline", "scrollBackground"];
   if (!KEYS.some(on)) return;
 
-  const VERSION = "2";
+  const VERSION = "3";
   const root = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (sel, r = document) => r.querySelector(sel);

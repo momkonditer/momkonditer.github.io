@@ -76,3 +76,47 @@
 @media (prefers-reduced-motion: reduce) {
   .decor-reveal { opacity: 1; transform: none; transition: none; }
 }
+
+/* ===== Цена на бирке (как ярлык на коробке с тортом) =====
+   Бирка — сам абзац .card__price: фон со срезанными уголками и дырочкой рисует ::after,
+   ленточка от края карточки к дырочке — ::before. Бирка в потоке, поэтому не налезает на фото и кнопку. */
+.dc-priceTags .card { --card-pad: 12px; }
+.dc-priceTags .card__price {
+  position: relative; z-index: 0;
+  align-self: flex-start; width: fit-content; max-width: calc(100% - 14px);
+  margin: 14px 0 4px 14px; padding: 6px 10px 6px 21px;
+  text-align: left; font-size: 12px; line-height: 1.3; color: var(--muted);
+  transform: rotate(-3deg); transform-origin: 9px 50%;
+}
+.dc-priceTags .card__price::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  /* дырочка с колечком слева, остальное — розовая бирка */
+  background: radial-gradient(circle at 10px 50%, transparent 0 3px, var(--rose-ink) 3.4px 4.4px, var(--rose-soft) 4.8px);
+  clip-path: polygon(7px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px);
+  box-shadow: inset 0 0 0 1px rgba(154, 76, 88, 0.15);
+}
+.dc-priceTags .card__price::before {
+  content: ""; position: absolute; top: 50%; z-index: 1;
+  left: calc(-14px - var(--card-pad)); width: calc(14px + var(--card-pad) + 10px); height: 16px;
+  transform: translateY(-75%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 42 16' preserveAspectRatio='none'%3E%3Cpath d='M0 3 C 12 2, 22 15, 42 12' fill='none' stroke='%239a4c58' stroke-width='1.3' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat 0 0 / 100% 100%;
+  opacity: 0.75; pointer-events: none;
+}
+.dc-priceTags .card__price strong { font-size: 16px; }
+.dc-priceTags .card--filling .card__price strong { white-space: nowrap; }  /* «2 500 ₽» не разрывается */
+@media (hover: hover) {
+  .dc-priceTags .card:hover .card__price { animation: decor-tag-swing 1.3s ease-in-out; }
+}
+@keyframes decor-tag-swing {
+  0% { transform: rotate(-3deg); }
+  25% { transform: rotate(1.5deg); }
+  50% { transform: rotate(-4.5deg); }
+  75% { transform: rotate(-1.8deg); }
+  100% { transform: rotate(-3deg); }
+}
+@media (min-width: 640px) {
+  .dc-priceTags .card { --card-pad: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dc-priceTags .card:hover .card__price { animation: none; }
+}
