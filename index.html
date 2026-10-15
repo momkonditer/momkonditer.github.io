@@ -20,19 +20,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <!-- Шрифты грузятся без блокировки показа страницы -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Marck+Script&amp;family=Montserrat:wght@800&amp;display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Marck+Script&amp;family=Montserrat:wght@800&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=15">
+  <link rel="stylesheet" href="styles.css?v=16">
 </head>
 <body>
   <a class="skip-link" href="#fillings">К начинкам</a>
 
   <header class="header">
     <div class="container header__inner">
-      <a class="logo logo--mini" href="#top" aria-label="MOM кондитер — наверх">
-        <span class="logo__mom">MOM</span><span class="logo__script">кондитер</span>
-      </a>
+      <a class="logo" href="#top" aria-label="MOM кондитер — наверх"><span class="logo__mom">MOM</span><span class="logo__script" data-logo="кондитер">кондитер</span></a>
       <nav class="nav" aria-label="Разделы">
         <a href="#fillings">Начинки</a>
         <a href="#desserts">Десерты</a>
@@ -49,10 +47,8 @@
     <section class="hero">
       <div class="container hero__inner">
         <div class="hero__text">
-          <h1 class="logo logo--big">
-            <span class="logo__mom">MOM</span><span class="logo__script">кондитер</span>
-          </h1>
-          <p class="hero__subtitle">Домашние торты и десерты на заказ в Электростали</p>
+          <p class="hero__eyebrow">кондитер Марина · Электросталь</p>
+          <h1 class="hero__title">Домашние торты и десерты на заказ</h1>
           <p class="hero__lead">Привет! Я Марина — мамаКондитер. Пеку из натуральных продуктов и делаю каждый торт индивидуально. Выберите начинку — и напишите мне, обсудим дизайн.</p>
           <div class="hero__actions">
             <a class="btn btn--primary" href="#fillings">Выбрать начинку</a>
@@ -181,7 +177,7 @@
 
   <footer class="footer">
     <div class="container footer__inner">
-      <span class="logo logo--mini"><span class="logo__mom">MOM</span><span class="logo__script">кондитер</span></span>
+      <a class="logo" href="#top" aria-label="MOM кондитер — наверх"><span class="logo__mom">MOM</span><span class="logo__script" data-logo="кондитер">кондитер</span></a>
       <p>Домашние торты и десерты на заказ · <span data-text="city"></span></p>
       <p class="footer__small">Заказ, оплата и детали — в личной переписке в Telegram.</p>
     </div>

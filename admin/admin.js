@@ -262,8 +262,14 @@
   let dirtyCheck = null;        // функция «есть ли несохранённое» для текущего экрана
   let currentHash = "#/";
 
+  // Главный экран и вход — логотип; остальные экраны — название раздела
   function setTitle(text) {
-    titleEl.textContent = text;
+    if (text === "MOM кондитер") {
+      titleEl.replaceChildren(el("a", { class: "logo", href: "#/", "aria-label": "MOM кондитер — на главную" }, [
+        el("span", { class: "logo__mom", text: "MOM" }), el("span", { class: "logo__script", "data-logo": "кондитер", text: "кондитер" })]));
+    } else {
+      titleEl.textContent = text;
+    }
     document.title = text === "MOM кондитер" ? "MOM админка" : `${text} · MOM админка`;
   }
 
@@ -323,7 +329,8 @@
     const msg = el("p", { class: "form-msg" + (message ? " is-error" : ""), role: "alert", text: message || "" });
 
     const form = el("form", { class: "login", novalidate: true }, [
-      el("div", { class: "login__logo", "aria-hidden": "true" }, [el("span", { text: "MOM" })]),
+      el("div", { class: "login__logo", "aria-hidden": "true" }, [el("span", { class: "logo" }, [
+        el("span", { class: "logo__mom", text: "MOM" }), el("span", { class: "logo__script", "data-logo": "кондитер", text: "кондитер" })])]),
       el("h2", { class: "login__title", text: "Вход для Марины" }),
       field("Пароль", input, "Пароль дал разработчик. Телефон запомнит вход на 90 дней.", "password"),
       showBtn,

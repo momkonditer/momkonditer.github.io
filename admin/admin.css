@@ -126,9 +126,34 @@ textarea.input { resize: vertical; min-height: 96px; }
 .login { display: grid; gap: 16px; padding-top: 24px; }
 .login__logo {
   justify-self: center; display: grid; place-items: center;
-  width: 96px; height: 96px; border-radius: 28px; background: var(--rose);
-  font-family: "Oswald", sans-serif; font-weight: 700; font-size: 34px;
+  width: 124px; height: 96px; border-radius: 28px; background: var(--rose);
 }
+.login__logo .logo { --logo-halo: var(--rose); }
+
+/* Логотип — как на сайте */
+.logo {
+  position: relative; display: inline-block; flex: none;
+  padding: 0 2px 7px; white-space: nowrap;
+  text-decoration: none; color: var(--ink); line-height: 1;
+  --logo-halo: var(--bg);
+}
+.logo__mom {
+  display: block;
+  font-family: "Montserrat", "Arial Black", system-ui, sans-serif; font-weight: 800;
+  font-size: 27px; letter-spacing: -0.035em; line-height: 0.9;
+}
+.logo__script {
+  position: absolute; left: 50%; bottom: 3px;
+  transform: translateX(-46%) rotate(-6deg); transform-origin: center;
+  font-family: "Marck Script", cursive; font-weight: 400; font-size: 18px; line-height: 1;
+  color: var(--rose-ink);
+}
+/* гладкий контур цветом фона под надписью (копия текста с обводкой) — «кондитер» пересекает буквы, но читается */
+.logo__script::before {
+  content: attr(data-logo); position: absolute; left: 0; top: 0; z-index: -1;
+  color: var(--logo-halo); -webkit-text-stroke: 4px var(--logo-halo);
+}
+.bar__title .logo { vertical-align: middle; }
 .login__title { text-align: center; font-family: "Oswald", sans-serif; font-weight: 500; font-size: 28px; }
 
 /* ===== Главный экран ===== */

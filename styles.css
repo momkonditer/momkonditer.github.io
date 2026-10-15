@@ -99,27 +99,30 @@ button { font: inherit; color: inherit; }
 }
 .link-btn:hover { color: var(--rose-ink); }
 
-/* ===== Логотип ===== */
+/* ===== Логотип: жирное «MOM» + рукописное «кондитер» поверх нижней части букв =====
+   Размеры в px и nowrap — блок не разъезжается ни на каком экране. */
 .logo {
-  position: relative; display: inline-block;
+  position: relative; display: inline-block; flex: none;
+  padding: 0 2px 7px; white-space: nowrap;
   text-decoration: none; color: var(--ink); line-height: 1;
+  --logo-halo: var(--bg);
 }
 .logo__mom {
   display: block;
-  font-family: var(--font-head); font-weight: 400; letter-spacing: 0.02em;
+  font-family: "Montserrat", "Arial Black", system-ui, sans-serif; font-weight: 800;
+  font-size: 27px; letter-spacing: -0.035em; line-height: 0.9;
 }
 .logo__script {
-  position: absolute; left: 50%; bottom: -0.05em;
-  transform: translateX(-50%) rotate(-6deg);
-  font-family: var(--font-head); font-weight: 400; white-space: nowrap;
+  position: absolute; left: 50%; bottom: 3px;
+  transform: translateX(-46%) rotate(-6deg); transform-origin: center;
+  font-family: "Marck Script", cursive; font-weight: 400; font-size: 18px; line-height: 1;
   color: var(--rose-ink);
-  text-shadow: 0 0 3px var(--bg), 0 0 6px var(--bg);
 }
-.logo--mini .logo__mom { font-size: 28px; }
-.logo--mini .logo__script { font-size: 11px; bottom: -0.45em; }
-.logo--big { padding-bottom: 0.15em; }
-.logo--big .logo__mom { font-size: clamp(84px, 28vw, 150px); line-height: 0.9; }
-.logo--big .logo__script { font-size: clamp(24px, 8vw, 42px); bottom: -0.2em; }
+/* гладкий контур цветом фона под надписью (копия текста с обводкой) — «кондитер» пересекает буквы, но читается */
+.logo__script::before {
+  content: attr(data-logo); position: absolute; left: 0; top: 0; z-index: -1;
+  color: var(--logo-halo); -webkit-text-stroke: 4px var(--logo-halo);
+}
 
 /* ===== Шапка ===== */
 .header {
@@ -153,9 +156,14 @@ button { font: inherit; color: inherit; }
 }
 .hero__inner { display: grid; gap: 32px; }
 .hero__text { position: relative; }
-.hero__subtitle {
-  margin-top: 18px;
-  font-family: var(--font-head); font-weight: 400; font-size: 22px; line-height: 1.25;
+.hero__eyebrow {
+  font-size: 12px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--rose-ink);
+}
+.hero__title {
+  margin-top: 12px;
+  font-family: var(--font-head); font-weight: 400; font-size: 36px; line-height: 1.1;
+  text-transform: none; max-width: 14ch;
 }
 .hero__lead { margin-top: 12px; color: var(--muted); max-width: 52ch; }
 .hero__actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
@@ -402,8 +410,8 @@ button { font: inherit; color: inherit; }
 /* ===== Футер ===== */
 .footer { padding: 36px 0 110px; background: var(--ink); color: #e9ded3; }
 .footer__inner { display: grid; gap: 10px; justify-items: start; }
-.footer .logo { color: #fff; }
-.footer .logo__script { color: var(--rose); text-shadow: 0 0 3px var(--ink), 0 0 6px var(--ink); }
+.footer .logo { color: #fff; --logo-halo: var(--ink); }
+.footer .logo__script { color: var(--rose); }
 .footer p { font-size: 14px; }
 .footer__small { color: #b6a89c; font-weight: 300; }
 
@@ -555,7 +563,8 @@ textarea.input { resize: vertical; }
   .hero { padding: 56px 0 72px; }
   .hero::before { width: 320px; height: 320px; right: 2%; top: 20px; }
   .hero__inner { grid-template-columns: 1.1fr 1fr; align-items: center; gap: 48px; }
-  .hero__subtitle { font-size: 26px; }
+  .hero__title { font-size: 60px; }
+  .hero__eyebrow { font-size: 13px; }
 
   .grid--fillings { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .grid--gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); }
