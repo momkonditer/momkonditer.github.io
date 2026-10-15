@@ -1,5 +1,6 @@
 /* Админка MOM кондитер — для телефона, крупно и просто */
 :root {
+  --font-accent: "Playfair Display", Georgia, serif;  /* акцент курсивом — как на сайте */
   --bg: #f7f0e7;
   --bg-tint: #efe4d6;
   --paper: #fffaf3;
@@ -143,9 +144,9 @@ textarea.input { resize: vertical; min-height: 96px; }
   font-size: 27px; letter-spacing: -0.035em; line-height: 0.9;
 }
 .logo__script {
-  position: absolute; left: 50%; bottom: 3px;
-  transform: translateX(-46%) rotate(-6deg); transform-origin: center;
-  font-family: "Marck Script", cursive; font-weight: 400; font-size: 18px; line-height: 1;
+  position: absolute; left: 50%; bottom: 2px;
+  transform: translateX(-44%) rotate(-5deg); transform-origin: center;
+  font-family: var(--font-accent); font-style: italic; font-weight: 500; font-size: 16px; line-height: 1;
   color: var(--rose-ink);
 }
 /* гладкий контур цветом фона под надписью (копия текста с обводкой) — «кондитер» пересекает буквы, но читается */

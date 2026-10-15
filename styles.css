@@ -16,6 +16,7 @@
 
   --font-head: "Cormorant Unicase", "Times New Roman", serif;   /* заголовки и бренд */
   --font-body: "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;  /* весь остальной текст */
+  --font-accent: "Playfair Display", Georgia, serif;  /* акцент курсивом: «кондитер» в логотипе, выделенные слова */
 
   color-scheme: light;
 }
@@ -113,9 +114,9 @@ button { font: inherit; color: inherit; }
   font-size: 27px; letter-spacing: -0.035em; line-height: 0.9;
 }
 .logo__script {
-  position: absolute; left: 50%; bottom: 3px;
-  transform: translateX(-46%) rotate(-6deg); transform-origin: center;
-  font-family: "Marck Script", cursive; font-weight: 400; font-size: 18px; line-height: 1;
+  position: absolute; left: 50%; bottom: 2px;
+  transform: translateX(-44%) rotate(-5deg); transform-origin: center;
+  font-family: var(--font-accent); font-style: italic; font-weight: 500; font-size: 16px; line-height: 1;
   color: var(--rose-ink);
 }
 /* гладкий контур цветом фона под надписью (копия текста с обводкой) — «кондитер» пересекает буквы, но читается */
@@ -140,7 +141,7 @@ button { font: inherit; color: inherit; }
 }
 .header .logo, .header .nav a { transition: color .35s ease; }
 .header .logo__script { transition: color .35s ease; }
-.header.is-over .logo { color: #fff; --logo-halo: rgba(28, 18, 16, 0.55); }
+.header.is-over .logo { color: #fff; --logo-halo: #5d5755; }  /* контур — цвет студийного фона фото под шапкой */
 .header.is-over .logo__script { color: #f6d3d6; }
 .header.is-over .nav a { color: rgba(255, 255, 255, 0.88); }
 .header.is-over .nav a:hover { color: #fff; }
@@ -195,7 +196,7 @@ button { font: inherit; color: inherit; }
 }
 .hero__script {
   display: inline-block;
-  font-family: "Marck Script", cursive; font-weight: 400; font-size: 1.08em; line-height: 1;
+  font-family: var(--font-accent); font-style: italic; font-weight: 400; font-size: 0.94em; line-height: 1;
   color: #f6d3d6;
 }
 .hero__lead { margin-top: 14px; color: rgba(255, 255, 255, 0.86); font-size: 16px; }

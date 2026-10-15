@@ -12,7 +12,7 @@
   const KEYS = ["lambethDividers", "marquee", "marble", "lineArt", "stats", "scriptAccents", "revealAnimation"];
   if (!KEYS.some(on)) return;
 
-  const VERSION = "1";
+  const VERSION = "2";
   const root = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (sel, r = document) => r.querySelector(sel);

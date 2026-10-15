@@ -66,7 +66,7 @@
 
 /* ===== Рукописное слово в заголовках ===== */
 .decor-script {
-  font-family: "Marck Script", cursive; font-weight: 400; font-size: 1.12em;
+  font-family: var(--font-accent); font-style: italic; font-weight: 400; font-size: 0.95em;
   color: var(--rose-ink); letter-spacing: 0; text-transform: none;
 }
 
