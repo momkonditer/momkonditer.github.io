@@ -48,6 +48,25 @@
       el("div", { class: "decor-marquee__track", "aria-hidden": "true" }, [half(), copy]),
     ]));
   }
+  /* ---------- Цифры после «Обо мне» ---------- */
+  if (on("stats")) {
+    const about = $("#about");
+    const STATS = [
+      ["20+", "начинок"],
+      ["от 2 кг", "торты на заказ"],
+      ["1300+", "подписчиков в Instagram"],
+      ["Электросталь", "доставка по городу", "word"],
+    ];
+    if (about) {
+      about.after(el("section", { class: "decor-stats", "aria-label": "Коротко о кондитерской" }, [
+        el("div", { class: "container decor-stats__grid" }, STATS.map(([num, label, mod]) =>
+          el("div", { class: "decor-stat" + (mod ? " decor-stat--" + mod : "") }, [
+            el("strong", { class: "decor-stat__num", text: num }),
+            el("span", { class: "decor-stat__label", text: label }),
+          ]))),
+      ]));
+    }
+  }
   /* ---------- Кремовые бордюры между секциями ---------- */
   if (on("lambethDividers") && main) {
     // между секциями: пропускаем первый экран и первую секцию после него (там бегущая строка)
