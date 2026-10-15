@@ -180,4 +180,37 @@
       words.forEach((w) => io.observe(w));
     }
   }
+  /* ---------- Фон страницы плавно меняет оттенок при прокрутке ---------- */
+  if (on("scrollBackground")) {
+    // очень светлые оттенки из палитры: сливочный → пудрово-розовый → карамельно-латте
+    const CREAM = [247, 240, 231], POWDER = [248, 234, 231], LATTE = [242, 230, 216];
+    const STOPS = [["top", CREAM], ["#fillings", POWDER], ["#gallery", POWDER], ["#reviews", LATTE], ["#contacts", LATTE]];
+    const body = document.body;
+    let frame = 0, last = "";
+    const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+    function paint() {
+      frame = 0;
+      const mid = window.scrollY + window.innerHeight / 2;
+      // опорные точки — середины разделов; между ними цвет смешивается плавно
+      const pts = STOPS.map(([sel, c]) => {
+        if (sel === "top") return [0, c];
+        const n = $(sel);
+        if (!n || n.hidden) return null;
+        const r = n.getBoundingClientRect();
+        return [r.top + window.scrollY + r.height / 2, c];
+      }).filter(Boolean).sort((a, b) => a[0] - b[0]);
+      let c = pts[pts.length - 1][1];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const [y0, c0] = pts[i], [y1, c1] = pts[i + 1];
+        if (mid <= y0) { c = c0; break; }
+        if (mid <= y1) { const t = (mid - y0) / (y1 - y0 || 1); c = mix(c0, c1, t * t * (3 - 2 * t)); break; }
+      }
+      const css = `rgb(${c.join(", ")})`;
+      if (css !== last) { body.style.backgroundColor = css; last = css; }
+    }
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(paint); };
+    paint();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+  }
 })();

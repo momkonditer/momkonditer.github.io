@@ -138,3 +138,9 @@
 @media (prefers-reduced-motion: reduce) {
   .decor-underline path { transition: none; }
 }
+
+/* ===== Плавная смена фона страницы при прокрутке (цвет ставит decor.js) ===== */
+.dc-scrollBackground body { transition: background-color .5s linear; }
+@media (prefers-reduced-motion: reduce) {
+  .dc-scrollBackground body { transition: none; }
+}
