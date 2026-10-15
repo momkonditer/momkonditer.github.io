@@ -101,7 +101,7 @@
 
     const reviews = (Array.isArray(raw && raw.reviews) ? raw.reviews : fb.reviews || [])
       .filter((r) => r && String(r.text || "").trim())
-      .map((r) => ({ id: String(r.id || ""), name: String(r.name || "").trim() || "Покупательница",
+      .map((r) => ({ id: String(r.id || ""), name: String(r.name || "").trim(),
         text: String(r.text).trim(), filling: String(r.filling || "").trim() }));
 
     const isoRe = /^\d{4}-\d{2}-\d{2}$/;
@@ -377,67 +377,92 @@
     $("#desserts").hidden = !D.desserts.length;
   }
 
-  /* ================= Отзывы: лента сообщений ================= */
-  const REVIEWS_SHOWN = 4;  // на телефоне сначала столько, остальные — по кнопке «Ещё отзывы»
-  let reviewsOpen = false;
-
-  // Пузыри мягко появляются по одному, когда доходят до экрана. Уже показанные не мигают при обновлении данных
-  const reviewsSeen = new Set();
-  const canAnimate = "IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const reviewObserver = canAnimate && new IntersectionObserver((entries) => {
-    entries.filter((e) => e.isIntersecting)
-      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-      .forEach((e, k) => {
-        e.target.style.transitionDelay = `${k * 140}ms`;
-        e.target.classList.add("is-in");
-        reviewsSeen.add(e.target.dataset.key);
-        reviewObserver.unobserve(e.target);
-      });
-  }, { rootMargin: "0px 0px -8% 0px" });
+  /* ================= Отзывы: слайдер, один отзыв за раз ================= */
+  const slider = $("#reviews-slider");
+  let slideIndex = 0;
+  const pad2 = (n) => String(n).padStart(2, "0");
 
   function renderReviews() {
     const list = $("#reviews-list");
-    const more = $("#reviews-more");
-    $("#reviews").hidden = !D.reviews.length;
-    if (reviewObserver) reviewObserver.disconnect();
+    const n = D.reviews.length;
+    $("#reviews").hidden = !n;
+    if (slideIndex >= n) slideIndex = 0;
+    // Все отзывы лежат в одной ячейке сетки: высота блока = самый длинный отзыв, страница не прыгает
     list.replaceChildren(...D.reviews.map((r, i) => {
       const f = r.filling && D.fillings.find((x) => x.id === r.filling);
-      const key = r.id || r.text;
-      const node = el("article", { class: "review" + (i >= REVIEWS_SHOWN ? " review--extra" : ""), "data-key": key }, [
-        el("span", { class: "review__avatar", "aria-hidden": "true", text: r.name.charAt(0).toUpperCase() }),
-        el("div", { class: "review__bubble" }, [
-          el("p", { class: "review__name", text: r.name }),
-          el("p", { class: "review__text", text: r.text }),
-          f ? el("a", { class: "review__tag", href: `#${f.id}`,
+      return el("figure", { class: "rquote", role: "group", "aria-roledescription": "отзыв", "aria-label": `${i + 1} из ${n}` }, [
+        el("blockquote", { class: "rquote__text", text: r.text }),
+        el("figcaption", { class: "rquote__foot" }, [
+          r.name ? el("span", { class: "rquote__by", text: `— ${r.name}` }) : null,
+          f ? el("a", { class: "rquote__tag", href: `#${f.id}`,
             "aria-label": `Начинка «${f.name}» — показать в меню`,
             onclick: (e) => {
               e.preventDefault();
               if (location.hash !== "#" + f.id) history.pushState(null, "", "#" + f.id);
               handleHash();
             } }, [el("span", { "aria-hidden": "true", text: "🍰" }), el("span", { text: f.name })]) : null,
-          el("p", { class: "review__meta" }, [
-            el("span", { text: "Instagram" }),
-            el("span", { class: "review__ticks", "aria-hidden": "true", text: "✓✓" }),
-          ]),
         ]),
       ]);
-      if (reviewObserver && !reviewsSeen.has(key)) {
-        node.classList.add("will-appear");
-        reviewObserver.observe(node);
-      }
-      return node;
     }));
-    const extra = D.reviews.length > REVIEWS_SHOWN;
-    list.classList.toggle("is-open", reviewsOpen || !extra);
-    more.hidden = reviewsOpen || !extra;
+    $("#reviews-dots").replaceChildren(...D.reviews.map((r, i) =>
+      el("button", { type: "button", class: "quotes__dot", "aria-label": `Отзыв ${i + 1}`, onclick: () => showReview(i) })));
+    $$(".quotes__arrow", slider).forEach((b) => (b.hidden = n < 2));
+    $("#reviews-dots").hidden = n < 2;
+    showReview(slideIndex, 0);
   }
 
-  $("#reviews-more").addEventListener("click", () => {
-    reviewsOpen = true;
-    renderReviews();
-    // фокус на первый открывшийся отзыв — чтобы клавиатура и скринридер не потерялись
-    const first = $("#reviews-list .review--extra");
-    if (first) { first.tabIndex = -1; first.focus({ preventScroll: true }); }
+  function showReview(i, dir) {
+    const slides = $$(".rquote", slider);
+    const n = slides.length;
+    if (!n) return;
+    const next = (i + n) % n;
+    // направление сдвига: вперёд — новый отзыв приходит справа
+    const d = dir != null ? dir : next >= slideIndex ? 1 : -1;
+    slider.style.setProperty("--from", `${d * 24}px`);
+    slideIndex = next;
+    slides.forEach((s, k) => {
+      const on = k === next;
+      s.classList.toggle("is-active", on);
+      s.setAttribute("aria-hidden", String(!on));
+      s.inert = !on;
+    });
+    $$(".quotes__dot", slider).forEach((b, k) => b.setAttribute("aria-current", k === next ? "true" : "false"));
+    $("#reviews-count").textContent = `${pad2(next + 1)} / ${pad2(n)}`;
+  }
+
+  $$(".quotes__arrow", slider).forEach((b) =>
+    b.addEventListener("click", () => showReview(slideIndex + Number(b.dataset.dir), Number(b.dataset.dir))));
+
+  // Свайп на телефоне
+  let swipeX = null, swipeY = null;
+  const viewport = $("#reviews-list");
+  viewport.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1) { swipeX = null; return; }
+    swipeX = e.touches[0].clientX;
+    swipeY = e.touches[0].clientY;
+  }, { passive: true });
+  viewport.addEventListener("touchend", (e) => {
+    if (swipeX === null) return;
+    const dx = e.changedTouches[0].clientX - swipeX;
+    const dy = e.changedTouches[0].clientY - swipeY;
+    swipeX = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      const d = dx < 0 ? 1 : -1;
+      showReview(slideIndex + d, d);
+    }
+  });
+
+  // Клавиши ← → — когда слайдер на экране и курсор не в поле ввода
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    if (e.altKey || e.ctrlKey || e.metaKey || $("#reviews").hidden) return;
+    if (document.querySelector("dialog[open]") || /^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || "")) return;
+    const r = slider.getBoundingClientRect();
+    const visible = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+    if (visible < r.height / 2) return;
+    e.preventDefault();
+    const d = e.key === "ArrowRight" ? 1 : -1;
+    showReview(slideIndex + d, d);
   });
 
   /* ================= Галерея, отзывы, фото страницы (один раз) ================= */

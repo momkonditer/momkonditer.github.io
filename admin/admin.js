@@ -709,7 +709,6 @@
 
   /* ================= Отзывы ================= */
 
-  const REVIEW_NAME = "Покупательница";
   const fillingName = (id) => {
     const f = id && state.data.fillings.find((x) => x.id === id);
     return f ? f.name : id || "";
@@ -722,13 +721,13 @@
       view.replaceChildren(
         el("button", { type: "button", class: "btn btn--primary btn--big btn--block", text: "+ Добавить отзыв",
           onclick: () => openReviewEditor(null) }),
-        el("p", { class: "hint", text: "Нажмите на отзыв, чтобы поправить текст, имя или начинку. На сайте они идут в том же порядке." }),
+        el("p", { class: "hint", text: "Нажмите на отзыв, чтобы поправить текст, подпись или начинку. На сайте они идут в том же порядке." }),
         items.length
           ? el("div", { class: "items" }, items.map((it) =>
             el("button", { type: "button", class: "item" + (it.visible ? "" : " is-hidden"), onclick: () => openReviewEditor(it) }, [
               el("div", { class: "thumb" }, [el("span", { class: "thumb__letter", text: "💬" })]),
               el("span", { class: "item__body" }, [
-                el("strong", { class: "item__name", text: it.name }),
+                el("strong", { class: "item__name", text: it.name || "Без подписи" }),
                 el("span", { class: "item__sub", text: it.text.length > 70 ? it.text.slice(0, 68).trim() + "…" : it.text }),
                 it.filling ? el("span", { class: "item__sub", text: "Начинка: " + fillingName(it.filling) }) : null,
                 it.visible ? null : el("span", { class: "badge", text: "Скрыто с сайта" }),
@@ -746,8 +745,8 @@
     const markDirty = () => (dirty = true);
     if (!state.data.reviews) state.data.reviews = [];
 
-    const nameInput = el("input", { class: "input", value: item ? item.name : "", maxlength: "40", autocapitalize: "words",
-      placeholder: REVIEW_NAME, oninput: markDirty });
+    const nameInput = el("input", { class: "input", value: item ? item.name : "", maxlength: "60", autocapitalize: "none",
+      placeholder: "торт на юбилей", oninput: markDirty });
     const textInput = el("textarea", { class: "input", rows: "6", maxlength: "1000", oninput: markDirty });
     textInput.value = item ? item.text : "";
     const fillingSelect = el("select", { class: "input", onchange: markDirty }, [
@@ -759,7 +758,7 @@
     }
     fillingSelect.value = item ? item.filling || "" : "";
 
-    const nameField = field("Имя", nameInput, `Например: Ирина. Оставите пустым — будет «${REVIEW_NAME}».`, "r-name");
+    const nameField = field("Подпись", nameInput, "Повод, маленькими буквами: «торт на юбилей», «бенто на 3 года». На сайте — под отзывом: «— торт на юбилей». Можно оставить пустым.", "r-name");
     const textField = field("Текст отзыва", textInput, "Как написал клиент, без изменений.", "r-text");
     const fillingField = field("Начинка", fillingSelect,
       "Если в отзыве хвалят начинку — выберите её: под отзывом будет кнопка, которая покажет эту начинку на сайте.", "r-filling");
@@ -820,7 +819,7 @@
       if (!item.visible) {
         const del = el("button", { type: "button", class: "btn btn--danger-ghost btn--block", text: "Удалить навсегда" });
         del.addEventListener("click", async () => {
-          if (!(await ask(`Удалить отзыв «${item.name}» навсегда? Вернуть будет нельзя.`, "Да, удалить", "Отмена", true))) return;
+          if (!(await ask(`Удалить отзыв «${item.name || item.text.slice(0, 30) + "…"}» навсегда? Вернуть будет нельзя.`, "Да, удалить", "Отмена", true))) return;
           del.disabled = true;
           del.textContent = "Удаляю…";
           try {
@@ -851,7 +850,7 @@
 
     editor.replaceChildren(
       el("div", { class: "editor__head" }, [
-        el("h2", { class: "editor__title", id: "editor-title", text: isNew ? "Новый отзыв" : "Отзыв: " + item.name }),
+        el("h2", { class: "editor__title", id: "editor-title", text: isNew ? "Новый отзыв" : "Отзыв" + (item.name ? ": " + item.name : "") }),
         el("button", { type: "button", class: "editor__close", "aria-label": "Закрыть", text: "×", onclick: tryClose }),
       ]),
       el("div", { class: "editor__body" }, [nameField, textField, fillingField, manage]),

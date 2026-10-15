@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=14">
+  <link rel="stylesheet" href="styles.css?v=15">
 </head>
 <body>
   <a class="skip-link" href="#fillings">К начинкам</a>
@@ -147,24 +147,15 @@
     <section class="section" id="reviews" aria-labelledby="reviews-title">
       <div class="container">
         <h2 class="section__title" id="reviews-title">Отзывы</h2>
-        <div class="chat">
-          <div class="chat__head">
-            <span class="chat__avatar" aria-hidden="true">М</span>
-            <div class="chat__who">
-              <strong>Марина · MOM кондитер</strong>
-              <small>отзывы клиентов</small>
-            </div>
+        <div class="quotes" id="reviews-slider" role="region" aria-roledescription="карусель" aria-label="Отзывы клиентов">
+          <div class="quotes__mark" aria-hidden="true">❝</div>
+          <div class="quotes__viewport" id="reviews-list" aria-live="polite"></div>
+          <div class="quotes__nav">
+            <button type="button" class="quotes__arrow" data-dir="-1" aria-label="Предыдущий отзыв">‹</button>
+            <span class="quotes__count" id="reviews-count" aria-hidden="true"></span>
+            <button type="button" class="quotes__arrow" data-dir="1" aria-label="Следующий отзыв">›</button>
           </div>
-          <div class="chat__feed">
-            <div class="chat__list" id="reviews-list"></div>
-            <button type="button" class="chat__more" id="reviews-more" hidden>Ещё отзывы</button>
-          </div>
-          <a class="chat__input" data-tg target="_blank" rel="noopener" aria-label="Написать Марине в Telegram">
-            <span class="chat__placeholder">Напишите Марине…</span>
-            <span class="chat__send" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6l-.01 6.53L15 12 3.39 13.87z"/></svg>
-            </span>
-          </a>
+          <div class="quotes__dots" id="reviews-dots"></div>
         </div>
       </div>
     </section>
@@ -293,8 +284,8 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=13"></script>
+  <script src="data.js?v=14"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=12"></script>
+  <script src="script.js?v=13"></script>
 </body>
 </html>
