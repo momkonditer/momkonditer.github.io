@@ -36,3 +36,16 @@
   background-image: url("images/decor/marble.svg?v=1");
   background-size: 480px 480px;
 }
+
+/* ===== Линейные рисунки у краёв секций ===== */
+.dc-lineArt main > section { position: relative; }
+.dc-lineArt main > section > .container { position: relative; z-index: 1; }
+.decor-art {
+  position: absolute; top: 8px; right: 10px; z-index: 0;
+  width: 40px; height: 40px; opacity: 0.25;
+  pointer-events: none; user-select: none;
+}
+.decor-art--sprig, .decor-art--cherry { transform: scaleX(-1); }
+@media (min-width: 960px) {
+  .decor-art { top: 4px; right: max(16px, calc((100% - 1160px) / 2 + 8px)); width: 72px; height: 72px; }
+}

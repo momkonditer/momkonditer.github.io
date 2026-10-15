@@ -55,4 +55,14 @@
       s.prepend(el("div", { class: "decor-divider decor-divider--" + (i % 2 ? "beads" : "wave"), "aria-hidden": "true" }));
     });
   }
+  /* ---------- Линейные рисунки у краёв секций ---------- */
+  if (on("lineArt")) {
+    const ART = { fillings: "whisk", desserts: "cherry", how: "piping-bag", about: "sprig", gallery: "cake-slice", reviews: "strawberry" };
+    Object.entries(ART).forEach(([id, name]) => {
+      const s = document.getElementById(id);
+      if (!s) return;
+      s.append(el("img", { class: "decor-art decor-art--" + name, src: "images/decor/" + name + ".svg?v=" + VERSION,
+        alt: "", "aria-hidden": "true", loading: "lazy", decoding: "async" }));
+    });
+  }
 })();
