@@ -98,35 +98,52 @@
     });
   }
   /* ---------- Мягкое появление блоков при прокрутке (один раз) ---------- */
-  if (on("revealAnimation") && !reduce && "IntersectionObserver" in window && main) {
+  if (on("revealAnimation") && !reduce && main) {
     const SEL = [".section__title", ".section__lead", ".filters", ".group", ".grid--desserts > .card", ".step", ".panel",
       ".about__media", ".features li", ".work-card", ".quotes", ".contacts", ".contacts__actions", ".decor-stat"].join(",");
     const seen = new Set();  // перерисованные блоки (свежие данные с сервера) второй раз не анимируем
     const keyOf = (n) => n.id || (n.dataset && n.dataset.cat) || "";
-    const io = new IntersectionObserver((entries) => {
-      entries.filter((e) => e.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top || a.boundingClientRect.left - b.boundingClientRect.left)
-        .forEach((e, k) => {
-          e.target.style.transitionDelay = Math.min(k, 5) * 80 + "ms";
-          e.target.classList.add("is-in");
-          const key = keyOf(e.target);
-          if (key) seen.add(key);
-          io.unobserve(e.target);
-        });
-    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.08 });
+    const pending = new Set();
+    let frame = 0;
+    // Показываем всё, что дошло до экрана или уже выше него (быстрая прокрутка, переход по ссылке)
+    function check() {
+      frame = 0;
+      const edge = window.innerHeight * 0.94;
+      const ready = [];
+      pending.forEach((n) => {
+        if (!n.isConnected) { pending.delete(n); return; }
+        const r = n.getBoundingClientRect();
+        if (r.top < edge) ready.push([n, r]);
+      });
+      ready.sort((a, b) => a[1].top - b[1].top || a[1].left - b[1].left).forEach(([n, r], k) => {
+        // по одному — только то, что видно; проскочившее выше показываем сразу
+        n.style.transitionDelay = r.bottom > 0 ? Math.min(k, 5) * 80 + "ms" : "0ms";
+        n.classList.add("is-in");
+        pending.delete(n);
+        const key = keyOf(n);
+        if (key) seen.add(key);
+      });
+    }
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(check); };
     const watch = (n) => {
       if (n.classList.contains("decor-reveal")) return;
       const key = keyOf(n);
       if (key && seen.has(key)) return;
       n.classList.add("decor-reveal");
-      io.observe(n);
+      pending.add(n);
     };
     $$(SEL, main).forEach(watch);
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
     // карточки начинок и десертов перерисовываются при обновлении данных
-    new MutationObserver((list) => list.forEach((m) => m.addedNodes.forEach((n) => {
-      if (n.nodeType !== 1) return;
-      if (n.matches(SEL)) watch(n);
-      $$(SEL, n).forEach(watch);
-    }))).observe(main, { childList: true, subtree: true });
+    new MutationObserver((list) => {
+      list.forEach((m) => m.addedNodes.forEach((n) => {
+        if (n.nodeType !== 1) return;
+        if (n.matches(SEL)) watch(n);
+        $$(SEL, n).forEach(watch);
+      }));
+      schedule();
+    }).observe(main, { childList: true, subtree: true });
   }
 })();
