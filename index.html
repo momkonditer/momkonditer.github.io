@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
 </head>
 <body>
   <a class="skip-link" href="#fillings">К начинкам</a>
@@ -259,10 +259,21 @@
     </div>
   </dialog>
 
+  <!-- Фото работ крупно -->
+  <dialog class="lightbox" id="lightbox" aria-label="Мои работы">
+    <div class="lightbox__stage">
+      <img class="lightbox__img" alt="">
+    </div>
+    <button class="lightbox__close" type="button" aria-label="Закрыть">×</button>
+    <button class="lightbox__nav lightbox__nav--prev" type="button" data-dir="-1" aria-label="Предыдущее фото">‹</button>
+    <button class="lightbox__nav lightbox__nav--next" type="button" data-dir="1" aria-label="Следующее фото">›</button>
+    <p class="lightbox__bar"><span class="lightbox__caption"></span> <span class="lightbox__count"></span></p>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=10"></script>
+  <script src="data.js?v=11"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=8"></script>
+  <script src="script.js?v=9"></script>
 </body>
 </html>

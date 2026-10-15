@@ -211,6 +211,39 @@ button { font: inherit; color: inherit; }
 .photo--story { aspect-ratio: 9 / 16; }
 .photo--hero { aspect-ratio: 4 / 5; border-radius: 28px; max-width: 520px; margin-inline: auto; width: 100%; }
 .photo--hero img { object-position: center 30%; }
+.photo--work { aspect-ratio: 4 / 5; width: 100%; }
+.work { display: block; width: 100%; padding: 0; border: 0; background: none; border-radius: var(--radius); cursor: zoom-in; }
+.work .photo { pointer-events: none; }
+
+/* ===== Лайтбокс ===== */
+.lightbox {
+  width: 100%; max-width: none; height: 100%; max-height: none; margin: 0; padding: 0; border: 0;
+  background: rgba(30, 22, 19, 0.94); color: #fff;
+  /* горизонтальный свайп листает фото, а не уводит браузер «назад» */
+  overscroll-behavior: contain; touch-action: pan-y pinch-zoom;
+}
+.lightbox[open] { display: block; }
+.lightbox::backdrop { background: rgba(30, 22, 19, 0.94); }
+.lightbox__stage {
+  position: absolute; inset: 56px 12px 72px;
+  display: flex; align-items: center; justify-content: center;
+}
+.lightbox__img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: var(--radius); }
+.lightbox__close, .lightbox__nav {
+  position: absolute; display: grid; place-items: center;
+  width: 48px; height: 48px; border: 0; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14); color: #fff; font-size: 30px; line-height: 1; cursor: pointer;
+}
+.lightbox__close { top: 6px; right: 8px; }
+.lightbox__nav { top: 50%; transform: translateY(-50%); }
+.lightbox__nav--prev { left: 8px; }
+.lightbox__nav--next { right: 8px; }
+.lightbox__nav[hidden] { display: none; }
+.lightbox__bar {
+  position: absolute; left: 16px; right: 16px; bottom: 16px;
+  text-align: center; font-size: 15px; line-height: 1.4;
+}
+.lightbox__count { margin-left: 8px; opacity: 0.65; font-size: 13px; white-space: nowrap; }
 .photo--portrait { aspect-ratio: 4 / 5; border-radius: 28px; width: 100%; max-width: 420px; margin-inline: auto; }
 
 /* ===== Фильтры и группы ===== */

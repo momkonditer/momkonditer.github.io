@@ -374,9 +374,18 @@
   /* ================= Галерея, отзывы, фото страницы (один раз) ================= */
   function renderStatic() {
     const gl = $("#gallery-list");
-    SITE.gallery.forEach((file, i) =>
-      gl.append(placeholderPhoto("photo--square", `images/gallery/${file}`, `Работа ${i + 1}`, `Фото работы ${pad(i + 1)}`))
-    );
+    const works = SITE.gallery.map((w, i) => {
+      const file = typeof w === "string" ? w : w.file;
+      const caption = (typeof w === "string" ? "" : w.caption) || `Работа ${i + 1}`;
+      return { src: `images/gallery/${file}?v=${encodeURIComponent(SITE.photoVersion || 1)}`, caption };
+    });
+    works.forEach((w, i) => {
+      const btn = el("button", { type: "button", class: "work", "aria-label": `Открыть фото: ${w.caption}` }, [
+        placeholderPhoto("photo--work", w.src, w.caption, `Фото работы ${pad(i + 1)}`),
+      ]);
+      btn.addEventListener("click", () => openLightbox(works, i, btn));
+      gl.append(btn);
+    });
 
     const rl = $("#reviews-list");
     SITE.reviews.forEach((file, i) => {
@@ -396,6 +405,61 @@
       attachPhoto(box, `${box.dataset.src}?v=${encodeURIComponent(SITE.photoVersion || 1)}`, box.dataset.alt);
     });
   }
+
+  /* ================= Лайтбокс галереи ================= */
+  const lb = $("#lightbox");
+  let lbItems = [];
+  let lbIndex = 0;
+  let lbOpener = null;
+
+  function showSlide(i) {
+    lbIndex = (i + lbItems.length) % lbItems.length;
+    const w = lbItems[lbIndex];
+    const img = $(".lightbox__img", lb);
+    img.src = w.src;
+    img.alt = w.caption;
+    $(".lightbox__caption", lb).textContent = w.caption;
+    $(".lightbox__count", lb).textContent = `${lbIndex + 1} / ${lbItems.length}`;
+    $$(".lightbox__nav", lb).forEach((b) => (b.hidden = lbItems.length < 2));
+  }
+
+  function openLightbox(items, i, from) {
+    lbItems = items;
+    lbOpener = from || null;
+    showSlide(i);
+    document.documentElement.classList.add("is-locked");
+    if (lb.showModal) lb.showModal();
+    else lb.setAttribute("open", "");
+    $(".lightbox__close", lb).focus();
+  }
+
+  function closeLightbox() {
+    if (lb.close) lb.close();
+    else { lb.removeAttribute("open"); lb.dispatchEvent(new Event("close")); }
+  }
+
+  lb.addEventListener("close", () => {
+    document.documentElement.classList.remove("is-locked");
+    if (lbOpener && document.contains(lbOpener)) lbOpener.focus();
+  });
+  $(".lightbox__close", lb).addEventListener("click", closeLightbox);
+  $$(".lightbox__nav", lb).forEach((b) => b.addEventListener("click", () => showSlide(lbIndex + Number(b.dataset.dir))));
+  // Клик мимо фото и кнопок закрывает
+  lb.addEventListener("click", (e) => { if (e.target === lb || e.target.classList.contains("lightbox__stage")) closeLightbox(); });
+  lb.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") showSlide(lbIndex - 1);
+    else if (e.key === "ArrowRight") showSlide(lbIndex + 1);
+    else if (e.key === "Escape" && !lb.showModal) closeLightbox();
+  });
+  // Листание свайпом
+  let touchX = null;
+  lb.addEventListener("touchstart", (e) => { touchX = e.touches.length === 1 ? e.touches[0].clientX : null; }, { passive: true });
+  lb.addEventListener("touchend", (e) => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    touchX = null;
+    if (Math.abs(dx) > 50 && lbItems.length > 1) showSlide(lbIndex + (dx < 0 ? 1 : -1));
+  });
 
   /* ================= Окно заявки ================= */
   const f = {
