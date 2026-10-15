@@ -69,3 +69,10 @@
   font-family: "Marck Script", cursive; font-weight: 400; font-size: 1.12em;
   color: var(--rose-ink); letter-spacing: 0; text-transform: none;
 }
+
+/* ===== Появление при прокрутке ===== */
+.decor-reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.decor-reveal.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .decor-reveal { opacity: 1; transform: none; transition: none; }
+}

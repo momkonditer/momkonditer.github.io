@@ -97,4 +97,36 @@
       if (h) h.replaceChildren(before, el("span", { class: "decor-script", text: word }));
     });
   }
+  /* ---------- Мягкое появление блоков при прокрутке (один раз) ---------- */
+  if (on("revealAnimation") && !reduce && "IntersectionObserver" in window && main) {
+    const SEL = [".section__title", ".section__lead", ".filters", ".group", ".grid--desserts > .card", ".step", ".panel",
+      ".about__media", ".features li", ".work-card", ".quotes", ".contacts", ".contacts__actions", ".decor-stat"].join(",");
+    const seen = new Set();  // перерисованные блоки (свежие данные с сервера) второй раз не анимируем
+    const keyOf = (n) => n.id || (n.dataset && n.dataset.cat) || "";
+    const io = new IntersectionObserver((entries) => {
+      entries.filter((e) => e.isIntersecting)
+        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top || a.boundingClientRect.left - b.boundingClientRect.left)
+        .forEach((e, k) => {
+          e.target.style.transitionDelay = Math.min(k, 5) * 80 + "ms";
+          e.target.classList.add("is-in");
+          const key = keyOf(e.target);
+          if (key) seen.add(key);
+          io.unobserve(e.target);
+        });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.08 });
+    const watch = (n) => {
+      if (n.classList.contains("decor-reveal")) return;
+      const key = keyOf(n);
+      if (key && seen.has(key)) return;
+      n.classList.add("decor-reveal");
+      io.observe(n);
+    };
+    $$(SEL, main).forEach(watch);
+    // карточки начинок и десертов перерисовываются при обновлении данных
+    new MutationObserver((list) => list.forEach((m) => m.addedNodes.forEach((n) => {
+      if (n.nodeType !== 1) return;
+      if (n.matches(SEL)) watch(n);
+      $$(SEL, n).forEach(watch);
+    }))).observe(main, { childList: true, subtree: true });
+  }
 })();
