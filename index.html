@@ -23,12 +23,12 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Marck+Script&amp;family=Montserrat:wght@800&amp;display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Marck+Script&amp;family=Montserrat:wght@800&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=16">
+  <link rel="stylesheet" href="styles.css?v=17">
 </head>
 <body>
   <a class="skip-link" href="#fillings">К начинкам</a>
 
-  <header class="header">
+  <header class="header is-over">
     <div class="container header__inner">
       <a class="logo" href="#top" aria-label="MOM кондитер — наверх"><span class="logo__mom">MOM</span><span class="logo__script" data-logo="кондитер">кондитер</span></a>
       <nav class="nav" aria-label="Разделы">
@@ -45,20 +45,28 @@
   <main id="top">
     <!-- Первый экран -->
     <section class="hero">
-      <div class="container hero__inner">
-        <div class="hero__text">
-          <p class="hero__eyebrow">кондитер Марина · Электросталь</p>
-          <h1 class="hero__title">Домашние торты и десерты на заказ</h1>
+      <div class="hero__stage">
+        <!-- ?v= — как photoVersion в data.js: заменили фото — увеличьте число -->
+        <img class="hero__photo" src="images/marina-hero.jpg?v=9" alt="Кондитер Марина с тортом" fetchpriority="high" decoding="async">
+        <div class="hero__shade" aria-hidden="true"></div>
+        <div class="container hero__content">
+          <p class="hero__eyebrow">Кондитер Марина · Электросталь</p>
+          <h1 class="hero__title">Домашние торты, <span class="hero__script">с любовью</span></h1>
           <p class="hero__lead">Привет! Я Марина — мамаКондитер. Пеку из натуральных продуктов и делаю каждый торт индивидуально. Выберите начинку — и напишите мне, обсудим дизайн.</p>
           <div class="hero__actions">
-            <a class="btn btn--primary" href="#fillings">Выбрать начинку</a>
-            <a class="btn btn--outline" data-tg href="#contacts" target="_blank" rel="noopener">Написать в Telegram</a>
+            <a class="btn btn--light" href="#fillings">Выбрать начинку</a>
+            <a class="btn btn--ghost-light" data-tg href="#contacts" target="_blank" rel="noopener">Написать в Telegram</a>
           </div>
-          <p class="gift" id="hero-gift"><span class="gift__icon" aria-hidden="true">🎁</span><span class="gift__text"></span></p>
         </div>
-        <div class="hero__media">
-          <div class="photo photo--hero" data-src="images/marina-hero.jpg" data-alt="Кондитер Марина с тортом" data-label="Фото Марины"></div>
-        </div>
+      </div>
+      <!-- Полоса фактов: числа подставляет script.js из данных -->
+      <div class="facts">
+        <dl class="container facts__grid">
+          <div class="fact"><dt class="fact__num" id="fact-fillings">20+</dt><dd class="fact__label">начинок</dd></div>
+          <div class="fact"><dt class="fact__num">от 2 кг</dt><dd class="fact__label">торты на заказ</dd></div>
+          <div class="fact"><dt class="fact__num" id="fact-promo">−10%</dt><dd class="fact__label">на первый заказ</dd></div>
+          <div class="fact fact--word"><dt class="fact__num">Электросталь</dt><dd class="fact__label">доставка по городу</dd></div>
+        </dl>
       </div>
     </section>
 
@@ -282,7 +290,7 @@
 
   <script src="data.js?v=15"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=13"></script>
+  <script src="script.js?v=14"></script>
   <!-- Декор: переключатели в data.js → decor -->
   <script src="decor.js?v=1"></script>
 </body>

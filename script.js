@@ -259,9 +259,11 @@
     $$("[data-text]").forEach((n) => (n.textContent = values[n.dataset.text] || ""));
     $$("[data-setting]").forEach((n) => (n.textContent = D[n.dataset.setting]));
 
-    const gift = $("#hero-gift");
-    gift.hidden = !D.settings.promoFirstShort;
-    $(".gift__text", gift).textContent = D.settings.promoFirstShort || "";
+    // Полоса фактов под первым экраном: начинок — по данным (вниз до десятков с «+»), скидка — из акции
+    const nFill = D.fillings.length;
+    $("#fact-fillings").textContent = nFill >= 10 ? `${Math.floor(nFill / 10) * 10}+` : String(nFill);
+    const promo = /(?:[−–-]\s?|скидк[а-яё]*\s+)(\d{1,2})\s?%/i.exec(`${D.settings.promoFirstShort || ""} ${D.settings.promoFirst || ""}`);
+    $("#fact-promo").textContent = `−${promo ? promo[1] : 10}%`;
 
     const terms = ["Оптимально заказывать за 2–3 недели до события (свадебные торты — заранее, уточняйте). При возможности возьму заказ даже за 2–3 дня.",
       `Предоплата ${D.prepayment}% от стоимости — обязательна для всех заказов.`]
@@ -808,6 +810,13 @@
       e.preventDefault();
     }
   });
+
+  /* ================= Шапка поверх фото первого экрана ================= */
+  // Наверху шапка прозрачная поверх фото, ниже — обычная (кремовая)
+  const header = $(".header");
+  const updateHeader = () => header.classList.toggle("is-over", window.scrollY < 40);
+  updateHeader();
+  window.addEventListener("scroll", updateHeader, { passive: true });
 
   /* ================= Ссылка #id на начинку ================= */
   let highlightTimer;

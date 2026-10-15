@@ -126,11 +126,24 @@ button { font: inherit; color: inherit; }
 
 /* ===== Шапка ===== */
 .header {
-  position: sticky; top: 0; z-index: 20;
+  /* fixed — чтобы первый экран с фото начинался под прозрачной шапкой */
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
   background: rgba(247, 240, 231, 0.88);
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(217, 202, 184, 0.6);
+  transition: background-color .35s ease, border-color .35s ease, -webkit-backdrop-filter .35s, backdrop-filter .35s;
 }
+/* шапка поверх фото первого экрана */
+.header.is-over {
+  background: transparent; border-bottom-color: transparent;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.header .logo, .header .nav a { transition: color .35s ease; }
+.header .logo__script { transition: color .35s ease; }
+.header.is-over .logo { color: #fff; --logo-halo: rgba(28, 18, 16, 0.55); }
+.header.is-over .logo__script { color: #f6d3d6; }
+.header.is-over .nav a { color: rgba(255, 255, 255, 0.88); }
+.header.is-over .nav a:hover { color: #fff; }
 .header__inner {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   min-height: var(--header-h);
@@ -142,38 +155,84 @@ button { font: inherit; color: inherit; }
 }
 .nav a:hover { color: var(--ink); }
 
-/* ===== Первый экран ===== */
-.hero {
-  position: relative;
-  padding: 32px 0 48px;
-  overflow: hidden;
+/* ===== Первый экран: фото на весь экран ===== */
+.hero { position: relative; }
+.hero__stage {
+  position: relative; overflow: hidden;
+  display: flex; align-items: flex-end;
+  height: 90vh; height: 90svh; min-height: 560px;
+  background: #3a2b27;
 }
-/* тонкая цветочная линия */
-.hero::before {
-  content: ""; position: absolute; right: -40px; top: 10px;
-  width: 220px; height: 220px; opacity: 0.5; pointer-events: none;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%239a4c58' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M20 190C60 150 80 110 100 60'/%3E%3Cpath d='M100 60c-14-6-22-20-16-34 14 4 22 18 16 34Z'/%3E%3Cpath d='M100 60c6-14 20-20 34-14-6 14-20 20-34 14Z'/%3E%3Cpath d='M86 100c-18 0-30-10-32-24 16-2 30 8 32 24Z'/%3E%3Cpath d='M74 130c10-14 26-18 38-10-10 14-26 18-38 10Z'/%3E%3Ccircle cx='100' cy='60' r='3'/%3E%3C/svg%3E") no-repeat center / contain;
+.hero__photo {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: 62% 20%;
 }
-.hero__inner { display: grid; gap: 32px; }
-.hero__text { position: relative; }
+/* затемнение: на телефоне снизу вверх, на компьютере слева направо */
+.hero__shade {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(28, 18, 16, 0.9) 0%, rgba(28, 18, 16, 0.82) 42%, rgba(28, 18, 16, 0.5) 62%, rgba(28, 18, 16, 0.1) 82%, rgba(28, 18, 16, 0.04) 100%);
+}
+/* сверху лёгкая тень — белая шапка читается на любом фото */
+.hero__shade::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 120px;
+  background: linear-gradient(to bottom, rgba(28, 18, 16, 0.35), rgba(28, 18, 16, 0));
+}
+.hero__content {
+  position: relative; z-index: 1; padding-top: 32px; padding-bottom: 36px; color: #fff;
+  /* мягкая тень — текст читается и на светлых местах фото */
+  text-shadow: 0 1px 14px rgba(28, 18, 16, 0.45);
+}
+.hero__actions .btn { text-shadow: none; }
+.hero__content > * { max-width: 600px; }
 .hero__eyebrow {
-  font-size: 12px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--rose-ink);
+  font-size: 12px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase;
+  color: #f6d3d6;
 }
 .hero__title {
-  margin-top: 12px;
-  font-family: var(--font-head); font-weight: 400; font-size: 36px; line-height: 1.1;
-  text-transform: none; max-width: 14ch;
+  margin-top: 10px;
+  font-family: var(--font-head); font-weight: 300; font-size: 38px; line-height: 1.08;
+  text-transform: none;
 }
-.hero__lead { margin-top: 12px; color: var(--muted); max-width: 52ch; }
-.hero__actions { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
-.gift {
-  display: flex; align-items: center; gap: 10px;
-  margin-top: 20px; padding: 12px 16px;
-  background: var(--rose-soft); border: 1px dashed var(--rose-ink); border-radius: 14px;
-  font-weight: 500; font-size: 15px;
+.hero__script {
+  display: inline-block;
+  font-family: "Marck Script", cursive; font-weight: 400; font-size: 1.08em; line-height: 1;
+  color: #f6d3d6;
 }
-.gift__icon { font-size: 22px; line-height: 1; }
+.hero__lead { margin-top: 14px; color: rgba(255, 255, 255, 0.86); font-size: 16px; }
+.hero__actions { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+.btn--light { background: #fff; color: var(--ink); }
+.btn--light:hover { background: var(--paper); }
+.btn--ghost-light { background: transparent; border-color: rgba(255, 255, 255, 0.85); color: #fff; }
+.btn--ghost-light:hover { background: rgba(255, 255, 255, 0.12); }
+.hero :focus-visible { outline-color: #fff; }
+@media (min-width: 701px) {
+  .hero__photo { object-position: 70% 22%; }
+  .hero__shade {
+    background: linear-gradient(to right, rgba(28, 18, 16, 0.78) 0%, rgba(28, 18, 16, 0.55) 35%, rgba(28, 18, 16, 0) 75%);
+  }
+  .hero__content { padding-bottom: 64px; }
+}
+/* планшет: фото уже, текст заходит на жакет и торт — добавляем затемнение снизу */
+@media (min-width: 701px) and (max-width: 1100px) {
+  .hero__shade {
+    background:
+      linear-gradient(to top, rgba(28, 18, 16, 0.72) 0%, rgba(28, 18, 16, 0.45) 35%, rgba(28, 18, 16, 0) 60%),
+      linear-gradient(to right, rgba(28, 18, 16, 0.78) 0%, rgba(28, 18, 16, 0.55) 35%, rgba(28, 18, 16, 0) 75%);
+  }
+}
+
+/* ===== Полоса фактов под фото ===== */
+.facts { background: var(--paper); border-bottom: 1px solid var(--line); }
+.facts__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding-block: 6px; }
+.fact {
+  display: grid; gap: 4px; align-content: center; justify-items: center; min-width: 0;
+  padding: 16px 8px; text-align: center;
+}
+.fact:nth-child(odd) { border-right: 1px solid var(--line); }
+.fact:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+.fact__num { font-family: var(--font-head); font-weight: 400; font-size: 30px; line-height: 1.1; color: var(--ink); }
+.fact--word .fact__num { font-size: 22px; line-height: 1.5; }
+.fact__label { margin: 0; font-size: 13px; font-weight: 300; line-height: 1.3; color: var(--muted); }
 
 /* ===== Секции ===== */
 .section { padding: 56px 0; }
@@ -216,8 +275,6 @@ button { font: inherit; color: inherit; }
 .photo--layers.has-photo { box-shadow: 0 4px 14px rgba(74, 48, 39, 0.12); }
 .photo--sm { width: 72px; max-width: 72px; margin: 0; flex: none; }
 .photo--square { aspect-ratio: 1; }
-.photo--hero { aspect-ratio: 4 / 5; border-radius: 28px; max-width: 520px; margin-inline: auto; width: 100%; }
-.photo--hero img { object-position: center 30%; }
 .photo--work { aspect-ratio: 4 / 5; width: 100%; }
 .work { display: block; width: 100%; padding: 0; border: 0; background: none; border-radius: var(--radius); cursor: zoom-in; }
 .work .photo { pointer-events: none; }
@@ -560,11 +617,16 @@ textarea.input { resize: vertical; }
   .section { padding: 80px 0; }
   .section__title { font-size: 42px; }
 
-  .hero { padding: 56px 0 72px; }
-  .hero::before { width: 320px; height: 320px; right: 2%; top: 20px; }
-  .hero__inner { grid-template-columns: 1.1fr 1fr; align-items: center; gap: 48px; }
-  .hero__title { font-size: 60px; }
+  .hero__title { font-size: 64px; }
   .hero__eyebrow { font-size: 13px; }
+  .hero__lead { font-size: 17px; max-width: 520px; }
+  .facts__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); padding-block: 10px; }
+  .fact { padding: 18px 12px; }
+  .fact:nth-child(odd) { border-right: 0; }
+  .fact:nth-child(-n+2) { border-bottom: 0; }
+  .fact + .fact { border-left: 1px solid var(--line); }
+  .fact__num { font-size: 40px; }
+  .fact--word .fact__num { font-size: 30px; line-height: 1.47; }
 
   .grid--fillings { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .grid--gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); }
