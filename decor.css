@@ -29,3 +29,10 @@
 @media (prefers-reduced-motion: reduce) {
   .decor-marquee__track { animation: none; }
 }
+
+/* ===== Мраморный фон «Обо мне» и «Отзывов» ===== */
+.dc-marble #about,
+.dc-marble #reviews {
+  background-image: url("images/decor/marble.svg?v=1");
+  background-size: 480px 480px;
+}
