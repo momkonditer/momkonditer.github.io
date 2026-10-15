@@ -39,9 +39,9 @@
   const hero = $(".hero");
   /* ---------- Бегущая строка под первым экраном ---------- */
   if (on("marquee") && hero) {
-    const TEXT = "натуральные сливки · без маргарина · торты от 2 кг · доставка по Электростали · каждый торт под заказ · 20+ начинок · ";
+    const TEXT = "каждый торт под заказ · 20+ начинок · доставка по Электростали · торты от 2 кг · ";
     // строка повторена, чтобы лента была длиннее любого экрана; вторая половина — копия для бесшовного круга
-    const half = () => el("span", { class: "decor-marquee__half" }, [TEXT.repeat(3)]);
+    const half = () => el("span", { class: "decor-marquee__half" }, [TEXT.repeat(4)]);
     const copy = half();
     copy.setAttribute("aria-hidden", "true");
     hero.after(el("div", { class: "decor-marquee", role: "note", "aria-label": TEXT.replace(/ · $/, "") }, [
