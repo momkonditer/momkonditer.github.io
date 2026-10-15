@@ -378,32 +378,54 @@
   }
 
   /* ================= Отзывы: лента сообщений ================= */
-  const REVIEWS_SHOWN = 5;  // на телефоне сначала столько, остальные — по кнопке «Ещё отзывы»
+  const REVIEWS_SHOWN = 4;  // на телефоне сначала столько, остальные — по кнопке «Ещё отзывы»
   let reviewsOpen = false;
+
+  // Пузыри мягко появляются по одному, когда доходят до экрана. Уже показанные не мигают при обновлении данных
+  const reviewsSeen = new Set();
+  const canAnimate = "IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reviewObserver = canAnimate && new IntersectionObserver((entries) => {
+    entries.filter((e) => e.isIntersecting)
+      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+      .forEach((e, k) => {
+        e.target.style.transitionDelay = `${k * 140}ms`;
+        e.target.classList.add("is-in");
+        reviewsSeen.add(e.target.dataset.key);
+        reviewObserver.unobserve(e.target);
+      });
+  }, { rootMargin: "0px 0px -8% 0px" });
 
   function renderReviews() {
     const list = $("#reviews-list");
     const more = $("#reviews-more");
     $("#reviews").hidden = !D.reviews.length;
+    if (reviewObserver) reviewObserver.disconnect();
     list.replaceChildren(...D.reviews.map((r, i) => {
       const f = r.filling && D.fillings.find((x) => x.id === r.filling);
-      return el("figure", { class: "review" + (i >= REVIEWS_SHOWN ? " review--extra" : "") }, [
-        el("figcaption", { class: "review__name", text: r.name }),
-        el("blockquote", { class: "review__bubble" }, [
+      const key = r.id || r.text;
+      const node = el("article", { class: "review" + (i >= REVIEWS_SHOWN ? " review--extra" : ""), "data-key": key }, [
+        el("span", { class: "review__avatar", "aria-hidden": "true", text: r.name.charAt(0).toUpperCase() }),
+        el("div", { class: "review__bubble" }, [
+          el("p", { class: "review__name", text: r.name }),
           el("p", { class: "review__text", text: r.text }),
+          f ? el("a", { class: "review__tag", href: `#${f.id}`,
+            "aria-label": `Начинка «${f.name}» — показать в меню`,
+            onclick: (e) => {
+              e.preventDefault();
+              if (location.hash !== "#" + f.id) history.pushState(null, "", "#" + f.id);
+              handleHash();
+            } }, [el("span", { "aria-hidden": "true", text: "🍰" }), el("span", { text: f.name })]) : null,
           el("p", { class: "review__meta" }, [
-            el("span", { text: "отзыв в Instagram" }),
+            el("span", { text: "Instagram" }),
             el("span", { class: "review__ticks", "aria-hidden": "true", text: "✓✓" }),
           ]),
         ]),
-        f ? el("a", { class: "review__tag", href: `#${f.id}`, text: f.name,
-          "aria-label": `Начинка «${f.name}» — показать в меню`,
-          onclick: (e) => {
-            e.preventDefault();
-            if (location.hash !== "#" + f.id) history.pushState(null, "", "#" + f.id);
-            handleHash();
-          } }) : null,
       ]);
+      if (reviewObserver && !reviewsSeen.has(key)) {
+        node.classList.add("will-appear");
+        reviewObserver.observe(node);
+      }
+      return node;
     }));
     const extra = D.reviews.length > REVIEWS_SHOWN;
     list.classList.toggle("is-open", reviewsOpen || !extra);

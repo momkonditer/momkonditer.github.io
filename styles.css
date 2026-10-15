@@ -342,36 +342,75 @@ button { font: inherit; color: inherit; }
 /* ===== Галерея и отзывы ===== */
 .grid--gallery { margin-top: 24px; }
 
-/* ===== Отзывы: лента чата ===== */
-.chat { margin-top: 24px; }
-.review { margin: 0 0 20px; padding-right: 12%; break-inside: avoid; }
-.review:nth-child(even) { padding-right: 0; padding-left: 9%; }
-.chat:not(.is-open) .review--extra { display: none; }
-.review__name { margin: 0 0 4px 14px; font-size: 13px; font-weight: 500; color: var(--rose-ink); }
+/* ===== Отзывы: окно чата ===== */
+.chat {
+  max-width: 560px; margin: 24px auto 0; overflow: hidden;
+  background: #fff; border: 1px solid var(--line); border-radius: 24px;
+  box-shadow: 0 10px 34px rgba(74, 48, 39, 0.1);
+}
+.chat__head {
+  display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+}
+.chat__avatar {
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--rose); color: var(--ink); font-family: var(--font-head); font-size: 22px; line-height: 1;
+}
+.chat__who { display: grid; line-height: 1.25; min-width: 0; }
+.chat__who strong { font-weight: 500; font-size: 15px; }
+.chat__who small { font-size: 12px; font-weight: 300; color: var(--muted); }
+.chat__feed { padding: 18px 14px 14px; background: #f7ebe5; }
+.chat__list { display: grid; gap: 16px; }
+.chat__list:not(.is-open) .review--extra { display: none; }
+
+.review { display: flex; align-items: flex-start; gap: 8px; }
+.review__avatar {
+  flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%;
+  background: var(--rose-ink); color: #fff; font-size: 15px; font-weight: 500; line-height: 1;
+}
 .review__bubble {
-  position: relative; margin: 0 0 0 7px; padding: 12px 14px 8px;
-  background: var(--rose-soft); border-radius: 20px 20px 20px 6px;
+  min-width: 0; max-width: calc(100% - 28px); padding: 10px 14px 7px;
+  background: #fff; border-radius: 6px 18px 18px 18px;
+  box-shadow: 0 1px 2px rgba(74, 48, 39, 0.1);
 }
-/* хвостик сообщения слева внизу */
-.review__bubble::before {
-  content: ""; position: absolute; left: -7px; bottom: 0;
-  width: 14px; height: 14px; background: inherit;
-  clip-path: path("M14 0 V14 H0 C6 12 11 8 14 0 Z");
+.review__name { font-size: 13px; font-weight: 500; color: var(--rose-ink); line-height: 1.3; }
+.review__text { margin-top: 3px; font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.review__tag {
+  display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 5px 11px;
+  background: var(--rose-soft); border-radius: 999px;
+  font-size: 12px; line-height: 1.3; color: var(--rose-ink); text-decoration: none;
 }
-.review__text { font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; }
+.review__tag:hover { background: var(--rose); }
 .review__meta {
-  display: flex; justify-content: flex-end; align-items: center; gap: 4px; margin-top: 4px;
+  display: flex; justify-content: flex-end; align-items: center; gap: 4px; margin-top: 2px;
   font-size: 11px; font-weight: 300; color: var(--muted);
 }
 .review__ticks { color: var(--rose-ink); font-size: 12px; letter-spacing: -0.2em; padding-right: 0.2em; }
-.review__tag {
-  display: inline-flex; align-items: center; min-height: 40px; margin: 8px 0 0 14px; padding: 8px 14px;
-  border: 1px solid var(--ink); border-radius: 999px;
-  font-size: 13px; line-height: 1.2; color: var(--ink); text-decoration: none;
+
+/* появление по одному (класс ставит JS; при prefers-reduced-motion не ставится) */
+.review.will-appear { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
+.review.will-appear.is-in { opacity: 1; transform: none; }
+
+.chat__more {
+  display: flex; align-items: center; justify-content: center; min-height: 44px; margin: 16px auto 0; padding: 10px 20px;
+  background: #fff; border: 1px solid var(--line); border-radius: 999px; cursor: pointer;
+  font: inherit; font-size: 14px; color: var(--ink);
 }
-.review__tag::after { content: "→"; margin-left: 6px; }
-.review__tag:hover { background: rgba(42, 32, 28, 0.06); }
-.chat__more { display: flex; margin: 4px auto 0; }
+.chat__more:hover { border-color: var(--ink); }
+
+.chat__input {
+  display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 16px;
+  border-top: 1px solid var(--line); color: var(--muted); text-decoration: none;
+}
+.chat__placeholder {
+  flex: 1; min-width: 0; min-height: 44px; display: flex; align-items: center; padding: 0 16px;
+  background: var(--bg); border-radius: 999px; font-size: 15px; font-weight: 300;
+}
+.chat__send {
+  flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--ink); color: #fff; transition: background .2s;
+}
+.chat__input:hover .chat__send { background: var(--rose-ink); }
 .grid--gallery { row-gap: 24px; }
 
 /* ===== Контакты ===== */
@@ -517,8 +556,7 @@ textarea.input { resize: vertical; }
   .hero__actions, .contacts__actions { flex-direction: row; flex-wrap: wrap; }
   .grid { gap: 16px; }
   .grid--fillings, .grid--desserts, .grid--gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .chat { columns: 2; column-gap: 32px; }
-  .chat:not(.is-open) .review--extra { display: block; }
+  .chat__list:not(.is-open) .review--extra { display: flex; }
   .chat__more { display: none; }
   .card { padding: 18px 16px 10px; }
   .card--filling .photo--round { width: min(100%, calc((100% + 32px) * 0.88)); }
