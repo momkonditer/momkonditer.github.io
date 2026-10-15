@@ -63,3 +63,9 @@
   .decor-stat__num { font-size: 40px; }
   .decor-stat--word .decor-stat__num { font-size: 30px; line-height: 1.47; }
 }
+
+/* ===== Рукописное слово в заголовках ===== */
+.decor-script {
+  font-family: "Marck Script", cursive; font-weight: 400; font-size: 1.12em;
+  color: var(--rose-ink); letter-spacing: 0; text-transform: none;
+}

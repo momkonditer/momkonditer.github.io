@@ -84,4 +84,17 @@
         alt: "", "aria-hidden": "true", loading: "lazy", decoding: "async" }));
     });
   }
+  /* ---------- Одно слово в заголовке — рукописным ---------- */
+  if (on("scriptAccents")) {
+    const ACCENTS = {
+      "fillings-title": ["Выберите ", "начинку"],
+      "how-title": ["Как ", "заказать"],
+      "gallery-title": ["Мои ", "работы"],
+      "reviews-title": ["Что говорят ", "гости"],
+    };
+    Object.entries(ACCENTS).forEach(([id, [before, word]]) => {
+      const h = document.getElementById(id);
+      if (h) h.replaceChildren(before, el("span", { class: "decor-script", text: word }));
+    });
+  }
 })();
