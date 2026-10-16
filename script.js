@@ -467,8 +467,50 @@
     showReview(slideIndex + d, d);
   });
 
+  /* ================= Частые вопросы: аккордеон + разметка FAQPage ================= */
+  function renderFaq() {
+    const list = $("#faq-list");
+    const items = (SITE.faq || []).filter((x) => x && x.q && x.a);
+    $("#faq").hidden = !items.length;
+    if (!items.length) return;
+
+    list.replaceChildren(...items.map((item, i) => {
+      const btn = el("button", { type: "button", class: "faq__q", id: `faq-q-${i + 1}`,
+        "aria-expanded": "false", "aria-controls": `faq-a-${i + 1}` }, [
+        el("span", { class: "faq__text", text: item.q }),
+        el("span", { class: "faq__icon", "aria-hidden": "true" }),
+      ]);
+      const panel = el("div", { class: "faq__a", id: `faq-a-${i + 1}`, role: "region", "aria-labelledby": `faq-q-${i + 1}` }, [
+        el("div", { class: "faq__inner" }, [el("p", { text: item.a })]),
+      ]);
+      panel.inert = true;
+      btn.addEventListener("click", () => toggleFaq(btn));
+      return el("div", { class: "faq__item" }, [el("h3", { class: "faq__head" }, [btn]), panel]);
+    }));
+
+    // Разметка для поисковиков — из тех же текстов
+    const ld = document.getElementById("faq-ld") || document.head.appendChild(el("script", { type: "application/ld+json", id: "faq-ld" }));
+    ld.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: items.map((x) => ({ "@type": "Question", name: x.q, acceptedAnswer: { "@type": "Answer", text: x.a } })),
+    });
+  }
+
+  // Открыт только один ответ: открываем нажатый, остальные закрываем
+  function toggleFaq(btn) {
+    const open = btn.getAttribute("aria-expanded") !== "true";
+    $$(".faq__q", $("#faq-list")).forEach((b) => {
+      const on = b === btn && open;
+      b.setAttribute("aria-expanded", String(on));
+      b.closest(".faq__item").classList.toggle("is-open", on);
+      $("#" + b.getAttribute("aria-controls")).inert = !on;
+    });
+  }
+
   /* ================= Галерея, отзывы, фото страницы (один раз) ================= */
   function renderStatic() {
+    renderFaq();
     const gl = $("#gallery-list");
     const works = SITE.gallery.map((w, i) => {
       const file = typeof w === "string" ? w : w.file;

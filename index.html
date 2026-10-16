@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Playfair+Display:ital,wght@1,400;1,500&amp;family=Montserrat:wght@800&amp;display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Playfair+Display:ital,wght@1,400;1,500&amp;family=Montserrat:wght@800&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=19">
+  <link rel="stylesheet" href="styles.css?v=20">
 </head>
 <body>
   <a class="skip-link" href="#fillings">К начинкам</a>
@@ -36,6 +36,7 @@
         <a href="#desserts">Десерты</a>
         <a href="#how">Как заказать</a>
         <a href="#terms">Условия</a>
+        <a href="#faq">Вопросы</a>
         <a href="#contacts">Контакты</a>
       </nav>
       <a class="btn btn--primary btn--sm" data-tg href="#contacts" target="_blank" rel="noopener">Написать</a>
@@ -164,6 +165,14 @@
       </div>
     </section>
 
+    <!-- Частые вопросы: тексты в data.js → faq -->
+    <section class="section" id="faq" aria-labelledby="faq-title">
+      <div class="container">
+        <h2 class="section__title" id="faq-title">Частые <span class="accent-word">вопросы</span></h2>
+        <div class="faq" id="faq-list"></div>
+      </div>
+    </section>
+
     <!-- Контакты -->
     <section class="section section--tinted" id="contacts" aria-labelledby="contacts-title">
       <div class="container">
@@ -288,10 +297,10 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=15"></script>
+  <script src="data.js?v=16"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=14"></script>
+  <script src="script.js?v=15"></script>
   <!-- Декор: переключатели в data.js → decor -->
-  <script src="decor.js?v=8"></script>
+  <script src="decor.js?v=9"></script>
 </body>
 </html>

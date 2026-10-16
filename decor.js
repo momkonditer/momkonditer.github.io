@@ -13,7 +13,7 @@
     "priceTags", "handUnderline", "scrollBackground"];
   if (!KEYS.some(on)) return;
 
-  const VERSION = "6";
+  const VERSION = "7";
   const root = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (sel, r = document) => r.querySelector(sel);
@@ -152,7 +152,7 @@
     const NS = "http://www.w3.org/2000/svg";
     // неровная волна в координатах 200×20: шаг и высота чуть гуляют, как у крема из мешка
     const WAVE = "M2 11 C 14 4, 22 4, 33 10 S 52 17, 64 10 S 84 3, 97 9 S 117 16, 129 10 S 150 4, 162 9 S 183 15, 198 8";
-    const words = $$(".hero__script, .decor-script");
+    const words = $$(".hero__script, .decor-script, .accent-word");
     // Волна строится в реальных пикселях слова: тогда длина штриха считается точно
     // и линия дорисовывается до конца при любой ширине (растянутый SVG рисовал её не целиком)
     function fit(w) {

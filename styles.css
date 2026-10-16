@@ -455,6 +455,53 @@ button { font: inherit; color: inherit; }
 .quotes__dot[aria-current="true"]::before { background: var(--rose-ink); transform: scale(1.2); }
 .grid--gallery { row-gap: 24px; }
 
+/* ===== Частые вопросы ===== */
+.accent-word {
+  font-family: var(--font-accent); font-style: italic; font-weight: 400; font-size: 0.95em;
+  color: var(--rose-ink); text-transform: none; letter-spacing: 0;
+}
+.faq { max-width: 820px; margin-top: 24px; display: grid; gap: 10px; }
+.faq__item {
+  background: var(--paper); border-radius: var(--radius); box-shadow: var(--shadow);
+  transition: box-shadow .25s ease;
+}
+.faq__item.is-open { box-shadow: 0 0 0 1px rgba(154, 76, 88, 0.22), var(--shadow); }
+.faq__head { margin: 0; font: inherit; }
+.faq__q {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  width: 100%; min-height: 56px; padding: 14px 16px 14px 18px;
+  background: none; border: 0; border-radius: var(--radius); cursor: pointer;
+  font: 500 16px/1.35 var(--font-body); color: var(--ink); text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+.faq__q:hover .faq__text { color: var(--rose-ink); }
+.faq__text { transition: color .2s; }
+/* плюс, который поворачивается в крестик */
+.faq__icon {
+  position: relative; flex: none; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--rose-soft); transition: transform .3s ease, background-color .3s ease;
+}
+.faq__icon::before, .faq__icon::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 1.5px;
+  background: var(--rose-ink); transform: translate(-50%, -50%); border-radius: 1px;
+}
+.faq__icon::after { transform: translate(-50%, -50%) rotate(90deg); }
+.is-open .faq__icon { transform: rotate(45deg); background: var(--rose); }
+/* плавное раскрытие: высота строки сетки 0fr → 1fr */
+.faq__a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
+.is-open > .faq__a { grid-template-rows: 1fr; }
+.faq__inner { overflow: hidden; min-height: 0; }
+.faq__inner p {
+  margin: 0; padding: 0 18px 18px; max-width: 68ch;
+  font-size: 15px; font-weight: 300; line-height: 1.6; color: var(--muted);
+  opacity: 0; transition: opacity .3s ease;
+}
+.is-open .faq__inner p { opacity: 1; transition-delay: .08s; }
+@media (min-width: 960px) {
+  .faq__q { font-size: 17px; padding: 18px 20px 18px 24px; }
+  .faq__inner p { padding: 0 24px 22px; font-size: 16px; }
+}
+
 /* ===== Контакты ===== */
 .contacts { margin: 24px 0 0; display: grid; gap: 2px; background: var(--paper); border-radius: var(--radius); box-shadow: var(--shadow); padding: 6px 20px; }
 .contacts__row { display: grid; gap: 2px; padding: 12px 0; border-bottom: 1px solid var(--bg-tint); }
