@@ -130,13 +130,12 @@
 .decor-underline path {
   fill: none; stroke: var(--rose); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
-  stroke-dasharray: 1; stroke-dashoffset: 1;
+  /* длину штриха (stroke-dasharray/offset) ставит decor.js по реальному размеру слова */
   transition: stroke-dashoffset .9s ease-out .15s;
 }
 .hero__script .decor-underline path { stroke: rgba(246, 211, 214, 0.55); }
 /* на первом экране слово крупное — линия ниже, чтобы не задевала буквы */
-.hero__script .decor-underline { bottom: -0.34em; }
-.is-drawn > .decor-underline path { stroke-dashoffset: 0; }
+.hero__script .decor-underline { bottom: -0.34em; left: -2%; width: 108%; }  /* курсив «ю» выступает вправо — линия с запасом */
 @media (prefers-reduced-motion: reduce) {
   .decor-underline path { transition: none; }
 }

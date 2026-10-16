@@ -13,7 +13,7 @@
     "priceTags", "handUnderline", "scrollBackground"];
   if (!KEYS.some(on)) return;
 
-  const VERSION = "4";
+  const VERSION = "6";
   const root = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (sel, r = document) => r.querySelector(sel);
@@ -150,31 +150,55 @@
   /* ---------- Волнистое подчёркивание акцентных слов («выдавлено кондитерским мешком») ---------- */
   if (on("handUnderline")) {
     const NS = "http://www.w3.org/2000/svg";
-    // неровная волна: шаг и высота чуть гуляют, как у крема из мешка
+    // неровная волна в координатах 200×20: шаг и высота чуть гуляют, как у крема из мешка
     const WAVE = "M2 11 C 14 4, 22 4, 33 10 S 52 17, 64 10 S 84 3, 97 9 S 117 16, 129 10 S 150 4, 162 9 S 183 15, 198 8";
     const words = $$(".hero__script, .decor-script");
+    // Волна строится в реальных пикселях слова: тогда длина штриха считается точно
+    // и линия дорисовывается до конца при любой ширине (растянутый SVG рисовал её не целиком)
+    function fit(w) {
+      const svg = w.querySelector(".decor-underline"), path = svg && svg.firstChild;
+      if (!path) return;
+      const r = svg.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      let i = 0;
+      path.setAttribute("d", WAVE.replace(/\d+(\.\d+)?/g, (n) => (i++ % 2 ? n * r.height / 20 : n * r.width / 200).toFixed(1)));
+      svg.setAttribute("viewBox", `0 0 ${r.width.toFixed(1)} ${r.height.toFixed(1)}`);
+      const len = Math.ceil(path.getTotalLength()) + 2;
+      path.style.transition = "none";  // подгонка без анимации
+      path.style.strokeDasharray = `${len}`;
+      path.style.strokeDashoffset = w.classList.contains("is-drawn") ? "0" : `${len}`;
+      path.getBoundingClientRect();
+      path.style.transition = "";
+    }
     words.forEach((w) => {
       if (w.querySelector(".decor-underline")) return;
       const svg = document.createElementNS(NS, "svg");
       svg.setAttribute("class", "decor-underline");
-      svg.setAttribute("viewBox", "0 0 200 20");
-      svg.setAttribute("preserveAspectRatio", "none");
       svg.setAttribute("aria-hidden", "true");
       svg.setAttribute("focusable", "false");
-      const path = document.createElementNS(NS, "path");
-      path.setAttribute("d", WAVE);
-      path.setAttribute("pathLength", "1");
-      svg.append(path);
+      svg.append(document.createElementNS(NS, "path"));
       w.classList.add("decor-underlined");
       w.append(svg);
+      fit(w);
     });
-    const draw = (w) => w.classList.add("is-drawn");
+    // шрифт догрузился или поменялась ширина экрана — подгоняем волну под слово
+    if ("ResizeObserver" in window) {
+      const ro = new ResizeObserver((list) => list.forEach((e) => fit(e.target)));
+      words.forEach((w) => ro.observe(w));
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => words.forEach(fit));
+    const draw = (w) => {
+      w.classList.add("is-drawn");
+      const path = w.querySelector(".decor-underline path");
+      if (path) path.style.strokeDashoffset = "0";
+    };
     if (reduce || !("IntersectionObserver" in window)) {
       words.forEach(draw);
     } else {
       const io = new IntersectionObserver((entries) => entries.forEach((e) => {
         if (!e.isIntersecting) return;
-        draw(e.target);
+        // кадр на то, чтобы начальное (скрытое) состояние линии успело примениться
+        requestAnimationFrame(() => draw(e.target));
         io.unobserve(e.target);
       }), { rootMargin: "0px 0px -10% 0px" });
       words.forEach((w) => io.observe(w));
