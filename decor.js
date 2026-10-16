@@ -9,11 +9,11 @@
 
   const D = (window.SITE && window.SITE.decor) || {};
   const on = (k) => D[k] === true;
-  const KEYS = ["lambethDividers", "marquee", "marble", "lineArt", "stats", "scriptAccents", "revealAnimation",
+  const KEYS = ["lambethDividers", "marquee", "marble", "lineArt", "scriptAccents", "revealAnimation",
     "priceTags", "handUnderline", "scrollBackground"];
   if (!KEYS.some(on)) return;
 
-  const VERSION = "7";
+  const VERSION = "8";
   const root = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (sel, r = document) => r.querySelector(sel);
@@ -49,25 +49,6 @@
       el("div", { class: "decor-marquee__track", "aria-hidden": "true" }, [half(), copy]),
     ]));
   }
-  /* ---------- Цифры после «Обо мне» ---------- */
-  if (on("stats")) {
-    const about = $("#about");
-    const STATS = [
-      ["20+", "начинок"],
-      ["от 2 кг", "торты на заказ"],
-      ["1300+", "подписчиков в Instagram"],
-      ["Электросталь", "доставка по городу", "word"],
-    ];
-    if (about) {
-      about.after(el("section", { class: "decor-stats", "aria-label": "Коротко о кондитерской" }, [
-        el("div", { class: "container decor-stats__grid" }, STATS.map(([num, label, mod]) =>
-          el("div", { class: "decor-stat" + (mod ? " decor-stat--" + mod : "") }, [
-            el("strong", { class: "decor-stat__num", text: num }),
-            el("span", { class: "decor-stat__label", text: label }),
-          ]))),
-      ]));
-    }
-  }
   /* ---------- Кремовые бордюры между секциями ---------- */
   if (on("lambethDividers") && main) {
     // между секциями: пропускаем первый экран и первую секцию после него (там бегущая строка)
@@ -101,7 +82,7 @@
   /* ---------- Мягкое появление блоков при прокрутке (один раз) ---------- */
   if (on("revealAnimation") && !reduce && main) {
     const SEL = [".section__title", ".section__lead", ".filters", ".group", ".grid--desserts > .card", ".step", ".panel",
-      ".about__media", ".features li", ".work-card", ".quotes", ".contacts", ".contacts__actions", ".decor-stat"].join(",");
+      ".about__media", ".features li", ".work-card", ".quotes", ".contacts", ".contacts__actions"].join(",");
     const seen = new Set();  // перерисованные блоки (свежие данные с сервера) второй раз не анимируем
     const keyOf = (n) => n.id || (n.dataset && n.dataset.cat) || "";
     const pending = new Set();

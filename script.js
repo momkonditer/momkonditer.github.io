@@ -259,11 +259,9 @@
     $$("[data-text]").forEach((n) => (n.textContent = values[n.dataset.text] || ""));
     $$("[data-setting]").forEach((n) => (n.textContent = D[n.dataset.setting]));
 
-    // Полоса фактов под первым экраном: начинок — по данным (вниз до десятков с «+»), скидка — из акции
+    // Полоса фактов под первым экраном: начинок — по данным (вниз до десятков с «+»)
     const nFill = D.fillings.length;
     $("#fact-fillings").textContent = nFill >= 10 ? `${Math.floor(nFill / 10) * 10}+` : String(nFill);
-    const promo = /(?:[−–-]\s?|скидк[а-яё]*\s+)(\d{1,2})\s?%/i.exec(`${D.settings.promoFirstShort || ""} ${D.settings.promoFirst || ""}`);
-    $("#fact-promo").textContent = `−${promo ? promo[1] : 10}%`;
 
     const terms = ["Оптимально заказывать за 2–3 недели до события (свадебные торты — заранее, уточняйте). При возможности возьму заказ даже за 2–3 дня.",
       `Предоплата ${D.prepayment}% от стоимости — обязательна для всех заказов.`]
@@ -318,14 +316,17 @@
     return el("article", { class: "card card--filling", id: item.id, "data-item": item.id }, [
       fillingPhoto(item),
       el("span", { class: "card__num", text: pad(num) }),
+      el("button", { type: "button", class: "card__share", title: "Скопировать ссылку",
+        "aria-label": `Скопировать ссылку на начинку «${item.name}»`, onclick: () => copyLink(item.id) }, [shareIcon()]),
       el("h4", { class: "card__title", text: item.name }),
       el("p", { class: "card__desc", text: item.desc }),
-      el("p", { class: "card__price" }, [el("strong", { text: `${money(item.price)} ₽` }), " / кг"]),
-      el("div", { class: "card__actions" }, [
-        el("button", { type: "button", class: "btn btn--primary btn--block", text: "Заказать",
-          onclick: (e) => openOrder({ type: "filling", item }, e.currentTarget) }),
-        el("button", { type: "button", class: "link-btn", text: "Скопировать ссылку на начинку",
-          onclick: () => copyLink(item.id) }),
+      // цена и кнопка прижаты к низу карточки — в ряду стоят на одной линии
+      el("div", { class: "card__foot" }, [
+        el("p", { class: "card__price" }, [el("strong", { text: `${money(item.price)} ₽` }), " / кг"]),
+        el("div", { class: "card__actions" }, [
+          el("button", { type: "button", class: "btn btn--primary btn--block", text: "Заказать",
+            onclick: (e) => openOrder({ type: "filling", item }, e.currentTarget) }),
+        ]),
       ]),
     ]);
   }
@@ -336,10 +337,21 @@
     $$(".group", fillingsList).forEach((g) => (g.hidden = id !== "all" && g.dataset.cat !== id));
   }
 
+  // Значок «поделиться»: три точки, соединённые линиями
+  function shareIcon() {
+    const NS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    svg.innerHTML = '<circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.4M8.3 13.2l7.4 4.4"/>';
+    return svg;
+  }
+
   function copyLink(id) {
     const url = location.href.split("#")[0] + "#" + id;
     copyText(url).then((ok) => {
-      if (ok) showToast("Ссылка на начинку скопирована");
+      if (ok) showToast("Ссылка скопирована");
       else window.prompt("Скопируйте ссылку на начинку:", url);
     });
   }
@@ -368,11 +380,13 @@
         el("h3", { class: "card__title", text: d.name }),
         el("p", { class: "card__desc", text: d.desc }),
         d.options.length ? el("p", { class: "card__desc card__options", text: optionsShort(d) }) : null,
-        d.price ? el("p", { class: "card__price" }, [el("strong", { text: dessertPrice(d) })]) : null,
-        el("div", { class: "card__actions" }, [
-          el("button", { type: "button", class: "btn btn--outline btn--block",
-            text: d.price ? "Заказать" : "Узнать цену",
-            onclick: (e) => openOrder({ type: "dessert", item: d }, e.currentTarget) }),
+        el("div", { class: "card__foot" }, [
+          d.price ? el("p", { class: "card__price" }, [el("strong", { text: dessertPrice(d) })]) : null,
+          el("div", { class: "card__actions" }, [
+            el("button", { type: "button", class: "btn btn--outline btn--block",
+              text: d.price ? "Заказать" : "Узнать цену",
+              onclick: (e) => openOrder({ type: "dessert", item: d }, e.currentTarget) }),
+          ]),
         ]),
       ])
     ));
@@ -852,6 +866,30 @@
       e.preventDefault();
     }
   });
+
+  /* ================= Плавающая кнопка «Заказать» ================= */
+  // Появляется, когда первый экран пролистан; прячется у вопросов, контактов и футера — там своя кнопка Telegram
+  const fab = $(".fab");
+  const heroStage = $(".hero__stage");
+  const fabHideZones = ["#faq", "#contacts", ".footer"].map((s) => $(s)).filter(Boolean);
+  let fabFrame = 0;
+  function updateFab() {
+    fabFrame = 0;
+    const vh = window.innerHeight;
+    const pastHero = !heroStage || heroStage.getBoundingClientRect().bottom < 80;
+    const inZone = fabHideZones.some((n) => {
+      if (n.hidden) return false;
+      const r = n.getBoundingClientRect();
+      return r.top < vh - 40 && r.bottom > 0;
+    });
+    fab.classList.toggle("is-hidden", !pastHero || inZone);
+  }
+  if (fab) {
+    updateFab();
+    const fabSchedule = () => { if (!fabFrame) fabFrame = requestAnimationFrame(updateFab); };
+    window.addEventListener("scroll", fabSchedule, { passive: true });
+    window.addEventListener("resize", fabSchedule);
+  }
 
   /* ================= Шапка поверх фото первого экрана ================= */
   // Наверху шапка прозрачная поверх фото, ниже — обычная (кремовая)

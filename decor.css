@@ -50,20 +50,6 @@
   .decor-art { top: 4px; right: max(16px, calc((100% - 1160px) / 2 + 8px)); width: 72px; height: 72px; }
 }
 
-/* ===== Цифры ===== */
-.decor-stats { padding: 28px 0; background: var(--paper); border-block: 1px solid rgba(154, 76, 88, 0.14); }
-.decor-stats__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; text-align: center; }
-.decor-stat { display: grid; gap: 4px; align-content: start; min-width: 0; }
-.decor-stat__num { font-family: var(--font-head); font-weight: 400; font-size: 32px; line-height: 1.1; color: var(--ink); }
-.decor-stat--word .decor-stat__num { font-size: 22px; line-height: 1.6; }
-.decor-stat__label { font-size: 13px; font-weight: 300; line-height: 1.35; color: var(--muted); }
-@media (min-width: 640px) {
-  .decor-stats { padding: 36px 0; }
-  .decor-stats__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .decor-stat__num { font-size: 40px; }
-  .decor-stat--word .decor-stat__num { font-size: 30px; line-height: 1.47; }
-}
-
 /* ===== Рукописное слово в заголовках ===== */
 .decor-script {
   font-family: var(--font-accent); font-style: italic; font-weight: 400; font-size: 0.95em;

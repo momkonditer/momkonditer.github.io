@@ -349,16 +349,29 @@ button { font: inherit; color: inherit; }
 }
 .card__title {
   margin-top: 12px;
-  font-weight: 400; font-size: 18px; line-height: 1.25;
-  overflow-wrap: anywhere;
+  /* длинные слова («Ленинградский») не рвутся, а чуть уменьшаются на узком экране */
+  font-weight: 400; font-size: clamp(15px, 4.6vw, 18px); line-height: 1.25;
+  overflow-wrap: normal; word-break: normal; hyphens: manual;
 }
 .card__desc { margin-top: 6px; font-size: 13px; font-weight: 300; line-height: 1.45; color: var(--muted); }
 .card__price { margin-top: 8px; font-size: 14px; font-weight: 300; color: var(--muted); }
 .card__price strong { font-size: 18px; color: var(--rose-ink); }
-.card__actions { margin-top: auto; padding-top: 12px; display: flex; flex-direction: column; align-items: center; }
+/* низ карточки: цена и кнопка всегда внизу — в ряду на одной линии */
+.card__foot { margin-top: auto; display: flex; flex-direction: column; }
+.card__actions { padding-top: 12px; display: flex; flex-direction: column; align-items: center; }
+/* «поделиться» — в правом верхнем углу, напротив номера */
+.card__share {
+  position: absolute; top: 4px; right: 4px; z-index: 2;
+  display: grid; place-items: center; width: 40px; height: 40px; padding: 0;
+  background: none; border: 0; border-radius: 50%; cursor: pointer; color: var(--muted);
+}
+.card__share svg { width: 17px; height: 17px; fill: currentColor; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.card__share svg path { fill: none; }
+.card__share:hover { color: var(--rose-ink); background: var(--rose-soft); }
 .card--dessert .photo { margin-bottom: 2px; }
 .card .btn { padding-inline: 12px; font-size: 14px; }
 .card--dessert .card__actions { padding-bottom: 6px; }
+.card--filling .card__actions { padding-bottom: 8px; }
 
 .card.is-highlight { animation: highlight 2.5s ease-out; }
 @keyframes highlight {
@@ -421,7 +434,7 @@ button { font: inherit; color: inherit; }
   overflow-x: clip; overflow-y: visible;
 }
 .rquote {
-  grid-area: 1 / 1; margin: 0; align-self: center;
+  grid-area: 1 / 1; margin: 0; align-self: start;  /* текст сразу под кавычкой, без пустоты сверху */
   opacity: 0; visibility: hidden; transform: translateX(var(--from, 24px));
   transition: opacity .45s ease, transform .45s ease, visibility 0s linear .45s;
 }
@@ -519,17 +532,31 @@ button { font: inherit; color: inherit; }
 .footer .logo__script { color: var(--rose); }
 .footer p { font-size: 14px; }
 .footer__small { color: #b6a89c; font-weight: 300; }
+.footer__links a { color: #fff; text-decoration-color: rgba(232, 195, 195, 0.6); text-underline-offset: 4px; }
+.footer__links a:hover { color: var(--rose); }
+.footer__links span { color: #b6a89c; }
 
 /* ===== Плавающая кнопка ===== */
 .fab {
   position: fixed; z-index: 30;
-  right: max(16px, env(safe-area-inset-right));
-  bottom: max(16px, env(safe-area-inset-bottom));
-  display: inline-flex; align-items: center; gap: 8px;
-  min-height: 52px; padding: 12px 20px;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  display: inline-flex; align-items: center; gap: 7px;
+  min-height: 46px; padding: 10px 16px;
   border-radius: 999px; background: var(--ink); color: #fff;
-  font-weight: 400; text-decoration: none;
+  font-size: 15px; font-weight: 400; text-decoration: none;
   box-shadow: 0 8px 24px rgba(42, 32, 28, 0.3);
+  transition: opacity .3s ease, transform .3s ease, visibility 0s;
+}
+.fab svg { width: 19px; height: 19px; }
+/* прячется на первом экране, у вопросов, контактов и футера */
+.fab.is-hidden {
+  opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(16px);
+  transition: opacity .3s ease, transform .3s ease, visibility 0s linear .3s;
+}
+@media (min-width: 640px) {
+  .fab { right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); min-height: 52px; padding: 12px 20px; font-size: 16px; gap: 8px; }
+  .fab svg { width: 22px; height: 22px; }
 }
 .fab:hover { background: #3d302a; }
 
@@ -677,7 +704,7 @@ textarea.input { resize: vertical; }
   .fact--word .fact__num { font-size: 30px; line-height: 1.47; }
 
   .grid--fillings { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .grid--gallery { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .grid--gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }  /* 6 работ — 2 ровных ряда */
   .card__title { font-size: 20px; }
   .rquote__text { font-size: 27px; }
   .quotes__mark { font-size: 88px; height: 62px; }
@@ -692,7 +719,17 @@ textarea.input { resize: vertical; }
 
   .footer__inner { grid-template-columns: auto 1fr; align-items: center; column-gap: 32px; }
   .footer__inner p:first-of-type { justify-self: end; }
+  .footer__links { grid-column: 1 / -1; }
   .footer__small { grid-column: 1 / -1; }
+
+  /* Контакты на компьютере: контакты в 2 колонки, крупные кнопки справа */
+  #contacts .container { display: grid; grid-template-columns: minmax(0, 1fr) 300px; column-gap: 32px; align-items: start; }
+  #contacts .section__title { grid-column: 1 / -1; }
+  .contacts { grid-template-columns: 1fr 1fr; column-gap: 40px; padding: 10px 28px; }
+  .contacts__row { grid-template-columns: 1fr; }
+  .contacts__row:nth-last-child(2) { border-bottom: 0; }
+  .contacts__actions { flex-direction: column; flex-wrap: nowrap; margin-top: 24px; gap: 12px; }
+  .contacts__actions .btn { min-height: 58px; font-size: 17px; width: 100%; }
 }
 
 /* ===== Первый экран на компьютере (шире 900px): ровный фон + фото справа целиком =====
