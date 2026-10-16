@@ -13,7 +13,7 @@
     "priceTags", "handUnderline", "scrollBackground"];
   if (!KEYS.some(on)) return;
 
-  const VERSION = "8";
+  const VERSION = "9";
   const root = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (sel, r = document) => r.querySelector(sel);
@@ -134,16 +134,19 @@
     // неровная волна в координатах 200×20: шаг и высота чуть гуляют, как у крема из мешка
     const WAVE = "M2 11 C 14 4, 22 4, 33 10 S 52 17, 64 10 S 84 3, 97 9 S 117 16, 129 10 S 150 4, 162 9 S 183 15, 198 8";
     const words = $$(".hero__script, .decor-script, .accent-word");
-    // Волна строится в реальных пикселях слова: тогда длина штриха считается точно
-    // и линия дорисовывается до конца при любой ширине (растянутый SVG рисовал её не целиком)
+
+    // Размер линии — из раскладки (ширина SVG в CSS = % от ширины слова), а не из getBoundingClientRect:
+    // на него влияют transform анимации появления. Волна строится в этих пикселях,
+    // preserveAspectRatio="none" — даже при устаревших размерах линия тянется на всю ширину, а не сжимается к центру.
     function fit(w) {
       const svg = w.querySelector(".decor-underline"), path = svg && svg.firstChild;
       if (!path) return;
-      const r = svg.getBoundingClientRect();
-      if (!r.width || !r.height) return;
+      const cs = getComputedStyle(svg);
+      const width = parseFloat(cs.width), height = parseFloat(cs.height);
+      if (!(width > 0) || !(height > 0)) return;
       let i = 0;
-      path.setAttribute("d", WAVE.replace(/\d+(\.\d+)?/g, (n) => (i++ % 2 ? n * r.height / 20 : n * r.width / 200).toFixed(1)));
-      svg.setAttribute("viewBox", `0 0 ${r.width.toFixed(1)} ${r.height.toFixed(1)}`);
+      path.setAttribute("d", WAVE.replace(/\d+(\.\d+)?/g, (n) => (i++ % 2 ? n * height / 20 : n * width / 200).toFixed(1)));
+      svg.setAttribute("viewBox", `0 0 ${width.toFixed(1)} ${height.toFixed(1)}`);
       const len = Math.ceil(path.getTotalLength()) + 2;
       path.style.transition = "none";  // подгонка без анимации
       path.style.strokeDasharray = `${len}`;
@@ -151,10 +154,13 @@
       path.getBoundingClientRect();
       path.style.transition = "";
     }
+    const fitAll = () => words.forEach(fit);
+
     words.forEach((w) => {
       if (w.querySelector(".decor-underline")) return;
       const svg = document.createElementNS(NS, "svg");
       svg.setAttribute("class", "decor-underline");
+      svg.setAttribute("preserveAspectRatio", "none");
       svg.setAttribute("aria-hidden", "true");
       svg.setAttribute("focusable", "false");
       svg.append(document.createElementNS(NS, "path"));
@@ -162,24 +168,36 @@
       w.append(svg);
       fit(w);
     });
-    // шрифт догрузился или поменялась ширина экрана — подгоняем волну под слово
-    if ("ResizeObserver" in window) {
-      const ro = new ResizeObserver((list) => list.forEach((e) => fit(e.target)));
-      words.forEach((w) => ro.observe(w));
+
+    // Пересчёт: шрифт загрузился (общий и именно Playfair Display), страница догрузилась, изменился размер
+    if (document.fonts) {
+      if (document.fonts.ready) document.fonts.ready.then(fitAll);
+      if (document.fonts.load) document.fonts.load('italic 400 1em "Playfair Display"').then(fitAll, () => {});
+      if (document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", fitAll);
     }
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => words.forEach(fit));
+    window.addEventListener("load", fitAll);
+    let resizeTimer = 0;
+    window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fitAll, 150); });
+    // ResizeObserver на inline-span не срабатывает — следим за заголовками
+    if ("ResizeObserver" in window) {
+      const ro = new ResizeObserver(fitAll);
+      new Set(words.map((w) => w.closest("h1, h2, h3") || w.parentElement)).forEach((h) => ro.observe(h));
+    }
+
     const draw = (w) => {
-      w.classList.add("is-drawn");
-      const path = w.querySelector(".decor-underline path");
-      if (path) path.style.strokeDashoffset = "0";
+      fit(w);  // перед рисованием — по текущей ширине слова
+      requestAnimationFrame(() => {
+        w.classList.add("is-drawn");
+        const path = w.querySelector(".decor-underline path");
+        if (path) path.style.strokeDashoffset = "0";
+      });
     };
     if (reduce || !("IntersectionObserver" in window)) {
-      words.forEach(draw);
+      words.forEach((w) => { w.classList.add("is-drawn"); fit(w); });
     } else {
       const io = new IntersectionObserver((entries) => entries.forEach((e) => {
         if (!e.isIntersecting) return;
-        // кадр на то, чтобы начальное (скрытое) состояние линии успело примениться
-        requestAnimationFrame(() => draw(e.target));
+        draw(e.target);
         io.unobserve(e.target);
       }), { rootMargin: "0px 0px -10% 0px" });
       words.forEach((w) => io.observe(w));
