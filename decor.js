@@ -13,7 +13,7 @@
     "priceTags", "handUnderline", "scrollBackground"];
   if (!KEYS.some(on)) return;
 
-  const VERSION = "9";
+  const VERSION = "10";
   const root = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (sel, r = document) => r.querySelector(sel);
@@ -80,44 +80,47 @@
     });
   }
   /* ---------- Мягкое появление блоков при прокрутке (один раз) ---------- */
-  if (on("revealAnimation") && !reduce && main) {
+  if (on("revealAnimation") && !reduce && main && "IntersectionObserver" in window) {
     const SEL = [".section__title", ".section__lead", ".filters", ".group", ".grid--desserts > .card", ".step", ".panel",
       ".about__media", ".features li", ".work-card", ".quotes", ".contacts", ".contacts__actions"].join(",");
     const seen = new Set();  // перерисованные блоки (свежие данные с сервера) второй раз не анимируем
     const keyOf = (n) => n.id || (n.dataset && n.dataset.cat) || "";
     const pending = new Set();
-    let frame = 0;
-    // Показываем всё, что дошло до экрана или уже выше него (быстрая прокрутка, переход по ссылке)
-    function check() {
-      frame = 0;
-      const edge = window.innerHeight * 0.94;
-      const ready = [];
-      pending.forEach((n) => {
-        if (!n.isConnected) { pending.delete(n); return; }
-        const r = n.getBoundingClientRect();
-        if (r.top < edge) ready.push([n, r]);
-      });
-      ready.sort((a, b) => a[1].top - b[1].top || a[1].left - b[1].left).forEach(([n, r], k) => {
-        // по одному — только то, что видно; проскочившее выше показываем сразу
-        n.style.transitionDelay = r.bottom > 0 ? Math.min(k, 5) * 80 + "ms" : "0ms";
-        n.classList.add("is-in");
-        pending.delete(n);
-        const key = keyOf(n);
-        if (key) seen.add(key);
-      });
+    function show(n, delay) {
+      pending.delete(n);
+      io.unobserve(n);
+      // will-change — только на время анимации
+      n.style.willChange = "opacity, transform";
+      n.style.transitionDelay = `${delay}ms`;
+      n.classList.add("is-in");
+      const done = () => { n.style.willChange = ""; n.style.transitionDelay = ""; };
+      n.addEventListener("transitionend", done, { once: true });
+      setTimeout(done, 400 + delay + 100);
+      const key = keyOf(n);
+      if (key) seen.add(key);
     }
-    const schedule = () => { if (!frame) frame = requestAnimationFrame(check); };
+    // Блоки появляются чуть раньше, чем доезжают до экрана (rootMargin 15% снизу)
+    const io = new IntersectionObserver((entries) => {
+      const shown = entries.filter((e) => e.isIntersecting).map((e) => e.target)
+        .sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+      if (!shown.length) return;
+      // проскочившее выше при быстрой прокрутке — сразу, без анимации-задержки
+      const last = shown[shown.length - 1];
+      pending.forEach((n) => {
+        if (!shown.includes(n) && n.compareDocumentPosition(last) & Node.DOCUMENT_POSITION_FOLLOWING && n.getBoundingClientRect().bottom < 0) show(n, 0);
+      });
+      // задержка между соседними — 40 мс, не больше 3 подряд
+      shown.forEach((n, k) => show(n, Math.min(k, 2) * 40));
+    }, { rootMargin: "0px 0px 15% 0px", threshold: 0 });
     const watch = (n) => {
       if (n.classList.contains("decor-reveal")) return;
       const key = keyOf(n);
       if (key && seen.has(key)) return;
       n.classList.add("decor-reveal");
       pending.add(n);
+      io.observe(n);
     };
     $$(SEL, main).forEach(watch);
-    schedule();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
     // карточки начинок и десертов перерисовываются при обновлении данных
     new MutationObserver((list) => {
       list.forEach((m) => m.addedNodes.forEach((n) => {
@@ -125,7 +128,7 @@
         if (n.matches(SEL)) watch(n);
         $$(SEL, n).forEach(watch);
       }));
-      schedule();
+      pending.forEach((n) => { if (!n.isConnected) { pending.delete(n); io.unobserve(n); } });
     }).observe(main, { childList: true, subtree: true });
   }
   /* ---------- Волнистое подчёркивание акцентных слов («выдавлено кондитерским мешком») ---------- */
@@ -205,35 +208,47 @@
   }
   /* ---------- Фон страницы плавно меняет оттенок при прокрутке ---------- */
   if (on("scrollBackground")) {
-    // очень светлые оттенки из палитры: сливочный → пудрово-розовый → карамельно-латте
-    const CREAM = [247, 240, 231], POWDER = [248, 234, 231], LATTE = [242, 230, 216];
-    const STOPS = [["top", CREAM], ["#fillings", POWDER], ["#gallery", POWDER], ["#reviews", LATTE], ["#contacts", LATTE]];
-    const body = document.body;
-    let frame = 0, last = "";
-    const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
-    function paint() {
-      frame = 0;
-      const mid = window.scrollY + window.innerHeight / 2;
-      // опорные точки — середины разделов; между ними цвет смешивается плавно
-      const pts = STOPS.map(([sel, c]) => {
-        if (sel === "top") return [0, c];
+    // очень светлые оттенки из палитры: сливочный (фон body::before) → пудрово-розовый → карамельно-латте.
+    // Каждый оттенок — свой фиксированный слой размером с экран; при прокрутке меняется только его opacity.
+    // Уровень: 0 — сливочный, 1 — пудровый, 2 — латте (слои накладываются, смесь = как раньше rgb-переход)
+    const STOPS = [["top", 0], ["#fillings", 1], ["#gallery", 1], ["#reviews", 2], ["#contacts", 2]];
+    const layers = ["powder", "latte"].map((name) => {
+      const d = el("div", { class: `decor-bg decor-bg--${name}`, "aria-hidden": "true" });
+      document.body.prepend(d);
+      return d;
+    });
+    let pts = [], frame = 0;
+    const last = ["", ""];
+    // Позиции разделов кешируем: пересчёт только при изменении размеров страницы, не на каждом кадре
+    function measure() {
+      pts = STOPS.map(([sel, level]) => {
+        if (sel === "top") return [0, level];
         const n = $(sel);
         if (!n || n.hidden) return null;
-        const r = n.getBoundingClientRect();
-        return [r.top + window.scrollY + r.height / 2, c];
+        return [n.offsetTop + n.offsetHeight / 2, level];
       }).filter(Boolean).sort((a, b) => a[0] - b[0]);
-      let c = pts[pts.length - 1][1];
-      for (let i = 0; i < pts.length - 1; i++) {
-        const [y0, c0] = pts[i], [y1, c1] = pts[i + 1];
-        if (mid <= y0) { c = c0; break; }
-        if (mid <= y1) { const t = (mid - y0) / (y1 - y0 || 1); c = mix(c0, c1, t * t * (3 - 2 * t)); break; }
-      }
-      const css = `rgb(${c.join(", ")})`;
-      if (css !== last) { body.style.backgroundColor = css; last = css; }
+      schedule();
     }
-    const schedule = () => { if (!frame) frame = requestAnimationFrame(paint); };
-    paint();
+    function paint() {
+      frame = 0;
+      if (!pts.length) return;
+      const mid = window.scrollY + window.innerHeight / 2;
+      let level = pts[pts.length - 1][1];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const [y0, l0] = pts[i], [y1, l1] = pts[i + 1];
+        if (mid <= y0) { level = l0; break; }
+        if (mid <= y1) { const t = (mid - y0) / (y1 - y0 || 1); level = l0 + (l1 - l0) * t * t * (3 - 2 * t); break; }
+      }
+      [Math.min(level, 1), Math.max(level - 1, 0)].forEach((o, i) => {
+        const v = o.toFixed(3);
+        if (v !== last[i]) { layers[i].style.opacity = v; last[i] = v; }
+      });
+    }
+    function schedule() { if (!frame) frame = requestAnimationFrame(paint); }
+    measure();
     window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    window.addEventListener("resize", measure);
+    window.addEventListener("load", measure);
+    if ("ResizeObserver" in window && main) new ResizeObserver(measure).observe(main);
   }
 })();

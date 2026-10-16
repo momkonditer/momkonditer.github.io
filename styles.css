@@ -25,6 +25,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
+  /* запасной фон страницы (основной — фиксированные слои body::before/::after) */
+  background-color: var(--bg);
   -webkit-text-size-adjust: 100%;
   font-variant-numeric: lining-nums;
   scroll-behavior: smooth;
@@ -40,14 +42,21 @@ body {
   margin: 0;
   font: 400 16px/1.6 var(--font-body);
   color: var(--ink);
-  background-color: var(--bg);
-  /* лёгкий «мрамор» */
+  background: transparent;
+  overflow-x: hidden;
+}
+/* Фон страницы — отдельные слои размером с экран (position: fixed): прокрутка их не перерисовывает.
+   Снизу сливочный цвет, сверху лёгкий «мрамор»; между ними decor.js кладёт слои оттенков (меняет только opacity). */
+body::before, body::after {
+  content: ""; position: fixed; inset: 0; pointer-events: none;
+}
+body::before { z-index: -3; background: var(--bg); }
+body::after {
+  z-index: -1;
   background-image:
     radial-gradient(ellipse 60% 40% at 15% 10%, rgba(255, 255, 255, 0.7), transparent 70%),
     radial-gradient(ellipse 50% 35% at 85% 35%, rgba(232, 195, 195, 0.18), transparent 70%),
     radial-gradient(ellipse 70% 40% at 30% 75%, rgba(255, 255, 255, 0.55), transparent 70%);
-  background-attachment: scroll;
-  overflow-x: hidden;
 }
 
 img { max-width: 100%; display: block; }
@@ -129,15 +138,14 @@ button { font: inherit; color: inherit; }
 .header {
   /* fixed — чтобы первый экран с фото начинался под прозрачной шапкой */
   position: fixed; top: 0; left: 0; right: 0; z-index: 20;
-  background: rgba(247, 240, 231, 0.88);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  /* без размытия (backdrop-filter тяжёлый на телефонах) — почти непрозрачный фон того же цвета */
+  background: rgba(247, 240, 231, 0.94);
   border-bottom: 1px solid rgba(217, 202, 184, 0.6);
-  transition: background-color .35s ease, border-color .35s ease, -webkit-backdrop-filter .35s, backdrop-filter .35s;
+  transition: background-color .35s ease, border-color .35s ease;
 }
 /* шапка поверх фото первого экрана */
 .header.is-over {
   background: transparent; border-bottom-color: transparent;
-  -webkit-backdrop-filter: none; backdrop-filter: none;
 }
 .header .logo, .header .nav a { transition: color .35s ease; }
 .header .logo__script { transition: color .35s ease; }
@@ -480,7 +488,7 @@ button { font: inherit; color: inherit; }
 .faq { max-width: 820px; margin-top: 24px; display: grid; gap: 10px; }
 .faq__item {
   background: var(--paper); border-radius: var(--radius); box-shadow: var(--shadow);
-  transition: box-shadow .25s ease;
+  contain: layout paint;  /* раскрытие ответа не пересчитывает остальную страницу */
 }
 .faq__item.is-open { box-shadow: 0 0 0 1px rgba(154, 76, 88, 0.22), var(--shadow); }
 .faq__head { margin: 0; font: inherit; }
@@ -505,9 +513,10 @@ button { font: inherit; color: inherit; }
 .faq__icon::after { transform: translate(-50%, -50%) rotate(90deg); }
 .is-open .faq__icon { transform: rotate(45deg); background: var(--rose); }
 /* плавное раскрытие: высота строки сетки 0fr → 1fr */
-.faq__a { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s ease; }
-.is-open > .faq__a { grid-template-rows: 1fr; }
-.faq__inner { overflow: hidden; min-height: 0; }
+/* высоту плавно меняет script.js (Web Animations API), здесь — конечные состояния */
+.faq__a { height: 0; overflow: hidden; }
+.is-open > .faq__a { height: auto; }
+.faq__q:focus-visible { outline-offset: -3px; }  /* contain: paint обрезал бы рамку снаружи */
 .faq__inner p {
   margin: 0; padding: 0 18px 18px; max-width: 68ch;
   font-size: 15px; font-weight: 300; line-height: 1.6; color: var(--muted);

@@ -57,7 +57,7 @@
 }
 
 /* ===== Появление при прокрутке ===== */
-.decor-reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.decor-reveal { opacity: 0; transform: translateY(12px); transition: opacity .4s ease, transform .4s ease; }
 .decor-reveal.is-in { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .decor-reveal { opacity: 1; transform: none; transition: none; }
@@ -127,7 +127,11 @@
 }
 
 /* ===== Плавная смена фона страницы при прокрутке (цвет ставит decor.js) ===== */
-.dc-scrollBackground body { transition: background-color .5s linear; }
+/* фиксированные слои размером с экран между сливочным фоном и «мрамором» (body::before / ::after);
+   меняется только opacity — это делает видеокарта, без перерисовки страницы */
+.decor-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0; transition: opacity .5s linear; }
+.decor-bg--powder { background: rgb(248, 234, 231); }
+.decor-bg--latte { background: rgb(242, 230, 216); }
 @media (prefers-reduced-motion: reduce) {
-  .dc-scrollBackground body { transition: none; }
+  .decor-bg { transition: none; }
 }

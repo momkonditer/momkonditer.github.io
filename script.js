@@ -165,6 +165,30 @@
      Заглушка рисуется самим контейнером (фон / подпись), картинка лежит поверх.
      Нет файла → img удаляется, остаётся заглушка. Есть файл → он закрывает заглушку.
      src может быть списком: не загрузился первый — пробуем следующий. */
+  // Фото из папки сайта: рядом лежат уменьшенные копии в sm/ — телефон берёт маленькую, компьютер большую.
+  // [ширина маленькой, ширина большой, высота большой]; sizes — сколько места фото занимает на экране
+  const PHOTO_SIZES = {
+    fillings: { sm: 450, w: 900, h: 900, sizes: "(min-width: 960px) 240px, (min-width: 640px) 200px, 140px" },
+    desserts: { sm: 500, w: 1000, h: 1000, sizes: "(min-width: 960px) 340px, (min-width: 640px) 220px, 150px" },
+    gallery: { sm: 600, w: 1000, h: 1250, sizes: "(min-width: 960px) 380px, (min-width: 640px) 240px, 160px" },
+  };
+  const LOCAL_PHOTO = /^images\/(fillings|desserts|gallery)\/([^/?]+\.jpg)(\?.*)?$/;
+  function setPhotoSrc(img, box, src) {
+    const m = LOCAL_PHOTO.exec(src);
+    if (m) {
+      const k = PHOTO_SIZES[m[1]];
+      img.srcset = `images/${m[1]}/sm/${m[2]}${m[3] || ""} ${k.sm}w, ${src} ${k.w}w`;
+      img.sizes = box.classList.contains("photo--sm") ? "72px" : k.sizes;
+      img.width = k.w;
+      img.height = k.h;
+    } else {
+      // фото с Google Диска (из админки) — как есть
+      img.removeAttribute("srcset");
+      img.removeAttribute("sizes");
+    }
+    img.src = src;
+  }
+
   function attachPhoto(box, src, alt, onLoad) {
     const srcs = [].concat(src).filter((s, i, a) => s && a.indexOf(s) === i);
     const img = new Image();
@@ -176,9 +200,9 @@
       box.classList.add("has-photo");
       if (onLoad) onLoad(img);
     });
-    img.addEventListener("error", () => (srcs.length ? (img.src = srcs.shift()) : img.remove()));
+    img.addEventListener("error", () => (srcs.length ? setPhotoSrc(img, box, srcs.shift()) : img.remove()));
     box.append(img);
-    img.src = srcs.shift() || "";
+    setPhotoSrc(img, box, srcs.shift() || "");
     return box;
   }
 
@@ -529,14 +553,28 @@
   }
 
   // Открыт только один ответ: открываем нажатый, остальные закрываем
+  const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   function toggleFaq(btn) {
     const open = btn.getAttribute("aria-expanded") !== "true";
     $$(".faq__q", $("#faq-list")).forEach((b) => {
       const on = b === btn && open;
+      const item = b.closest(".faq__item");
+      if (item.classList.contains("is-open") === on) return;
+      const panel = $("#" + b.getAttribute("aria-controls"));
       b.setAttribute("aria-expanded", String(on));
-      b.closest(".faq__item").classList.toggle("is-open", on);
-      $("#" + b.getAttribute("aria-controls")).inert = !on;
+      panel.inert = !on;
+      animateFaq(item, panel, on);
     });
+  }
+  // Плавно меняем высоту только у этого ответа: замеряем «было» и «стало», анимируем height
+  function animateFaq(item, panel, open) {
+    const from = panel.getBoundingClientRect().height;
+    if (panel._anim) panel._anim.cancel();
+    item.classList.toggle("is-open", open);
+    const to = open ? panel.scrollHeight : 0;
+    if (reduceMotion() || !panel.animate || from === to) return;
+    panel._anim = panel.animate([{ height: `${from}px` }, { height: `${to}px` }], { duration: 350, easing: "ease" });
+    panel._anim.onfinish = panel._anim.oncancel = () => { panel._anim = null; };
   }
 
   /* ================= Галерея, отзывы, фото страницы (один раз) ================= */
@@ -889,9 +927,8 @@
   const fab = $(".fab");
   const heroStage = $(".hero__stage");
   const fabHideZones = ["#faq", "#contacts", ".footer"].map((s) => $(s)).filter(Boolean);
-  let fabFrame = 0;
   function updateFab() {
-    fabFrame = 0;
+    if (!fab) return;
     const vh = window.innerHeight;
     const pastHero = !heroStage || heroStage.getBoundingClientRect().bottom < 80;
     const inZone = fabHideZones.some((n) => {
@@ -901,19 +938,19 @@
     });
     fab.classList.toggle("is-hidden", !pastHero || inZone);
   }
-  if (fab) {
-    updateFab();
-    const fabSchedule = () => { if (!fabFrame) fabFrame = requestAnimationFrame(updateFab); };
-    window.addEventListener("scroll", fabSchedule, { passive: true });
-    window.addEventListener("resize", fabSchedule);
-  }
 
   /* ================= Шапка поверх фото первого экрана ================= */
   // Наверху шапка прозрачная поверх фото, ниже — обычная (кремовая)
   const header = $(".header");
   const updateHeader = () => header.classList.toggle("is-over", window.scrollY < 40);
-  updateHeader();
-  window.addEventListener("scroll", updateHeader, { passive: true });
+
+  // Один обработчик прокрутки на шапку и плавающую кнопку: не чаще раза за кадр
+  let scrollFrame = 0;
+  const onScrollFrame = () => { scrollFrame = 0; updateHeader(); updateFab(); };
+  const scheduleScroll = () => { if (!scrollFrame) scrollFrame = requestAnimationFrame(onScrollFrame); };
+  onScrollFrame();
+  window.addEventListener("scroll", scheduleScroll, { passive: true });
+  window.addEventListener("resize", scheduleScroll);
 
   /* ================= Ссылка #id на начинку ================= */
   let highlightTimer;
