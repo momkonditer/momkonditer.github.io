@@ -444,7 +444,24 @@
     });
     $$(".quotes__dot", slider).forEach((b, k) => b.setAttribute("aria-current", k === next ? "true" : "false"));
     $("#reviews-count").textContent = `${pad2(next + 1)} / ${pad2(n)}`;
+    sizeReviews(dir !== 0);
   }
+
+  // Высота блока — по текущему отзыву: стрелки и точки сразу под текстом, смена высоты плавная (0.3 с)
+  const reviewsViewport = $("#reviews-list");
+  function sizeReviews(animate) {
+    const active = $(".rquote.is-active", slider);
+    if (!active) return;
+    const cs = getComputedStyle(reviewsViewport);
+    const h = active.offsetHeight + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    if (!animate) reviewsViewport.style.transition = "none";
+    reviewsViewport.style.height = `${h}px`;
+    if (!animate) { reviewsViewport.getBoundingClientRect(); reviewsViewport.style.transition = ""; }
+  }
+  let reviewsResize = 0;
+  window.addEventListener("resize", () => { clearTimeout(reviewsResize); reviewsResize = setTimeout(() => sizeReviews(false), 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => sizeReviews(false));
+  window.addEventListener("load", () => sizeReviews(false));
 
   $$(".quotes__arrow", slider).forEach((b) =>
     b.addEventListener("click", () => showReview(slideIndex + Number(b.dataset.dir), Number(b.dataset.dir))));

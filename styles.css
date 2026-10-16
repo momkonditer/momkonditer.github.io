@@ -431,7 +431,8 @@ button { font: inherit; color: inherit; }
   display: grid; touch-action: pan-y;
   /* сдвинутые скрытые отзывы не должны давать горизонтальную прокрутку */
   overflow: hidden; padding: 4px; margin: -4px;
-  overflow-x: clip; overflow-y: visible;
+  /* высота — по текущему отзыву (ставит script.js), меняется плавно */
+  transition: height .3s ease;
 }
 .rquote {
   grid-area: 1 / 1; margin: 0; align-self: start;  /* текст сразу под кавычкой, без пустоты сверху */
@@ -459,11 +460,14 @@ button { font: inherit; color: inherit; }
 }
 .quotes__arrow:hover { border-color: var(--ink); }
 .quotes__count { min-width: 64px; font-size: 14px; font-weight: 300; letter-spacing: 0.08em; color: var(--muted); font-variant-numeric: tabular-nums; }
-.quotes__dots { display: flex; justify-content: center; gap: 0; margin-top: 10px; }
+.quotes__dots { display: flex; justify-content: center; gap: 0; margin-top: -1px; }
+/* точка прежняя (7px), увеличена только область нажатия: 44px в высоту; в ширину 36px —
+   9 точек по 44px (396px) не помещаются на телефоне, с 440px — 44×44 */
 .quotes__dot {
-  width: 22px; height: 22px; padding: 0; border: 0; background: transparent; cursor: pointer;
+  width: 36px; height: 44px; padding: 0; border: 0; background: transparent; cursor: pointer;
   display: grid; place-items: center;
 }
+@media (min-width: 440px) { .quotes__dot { width: 44px; } }
 .quotes__dot::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--line); transition: background .2s, transform .2s; }
 .quotes__dot[aria-current="true"]::before { background: var(--rose-ink); transform: scale(1.2); }
 .grid--gallery { row-gap: 24px; }
@@ -522,6 +526,8 @@ button { font: inherit; color: inherit; }
 .contacts dt { font-size: 13px; font-weight: 300; color: var(--muted); }
 .contacts dd { margin: 0; font-weight: 500; font-size: 17px; overflow-wrap: anywhere; }
 .contacts dd a { text-decoration-color: var(--rose); text-underline-offset: 4px; }
+/* область нажатия ссылок 44px в высоту; отрицательный отступ — чтобы строки не стали выше */
+.contacts dd a[href] { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; margin: -12px 0; }
 .selectable { user-select: all; -webkit-user-select: all; }
 .contacts__actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
 
