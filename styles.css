@@ -739,7 +739,7 @@ textarea.input { resize: vertical; }
 @media (min-width: 901px) {
   .hero__stage {
     --hero-h: clamp(600px, 88vh, 820px);
-    --photo-w: calc(var(--hero-h) * 0.7483);
+    --photo-w: calc(var(--hero-h) * 0.75);
     height: var(--hero-h); min-height: 0;
     align-items: center;
     background:
