@@ -91,7 +91,7 @@
       "fillings-title": ["Выберите ", "начинку"],
       "how-title": ["Как ", "заказать"],
       "gallery-title": ["Мои ", "работы"],
-      "reviews-title": ["Что говорят ", "гости"],
+      "reviews-title": ["Что говорят ", "клиенты"],
     };
     Object.entries(ACCENTS).forEach(([id, [before, word]]) => {
       const h = document.getElementById(id);
