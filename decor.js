@@ -13,7 +13,7 @@
     "priceTags", "handUnderline", "scrollBackground"];
   if (!KEYS.some(on)) return;
 
-  const VERSION = "3";
+  const VERSION = "4";
   const root = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (sel, r = document) => r.querySelector(sel);

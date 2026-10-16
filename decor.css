@@ -134,6 +134,8 @@
   transition: stroke-dashoffset .9s ease-out .15s;
 }
 .hero__script .decor-underline path { stroke: rgba(246, 211, 214, 0.55); }
+/* на первом экране слово крупное — линия ниже, чтобы не задевала буквы */
+.hero__script .decor-underline { bottom: -0.34em; }
 .is-drawn > .decor-underline path { stroke-dashoffset: 0; }
 @media (prefers-reduced-motion: reduce) {
   .decor-underline path { transition: none; }
