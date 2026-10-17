@@ -779,30 +779,46 @@ textarea.input { resize: vertical; }
   .hero__actions { flex-wrap: wrap; }
 }
 
-/* ===== Первый экран на телефоне и планшете (до 900px): фото целиком по ширине =====
+/* ===== Первый экран на телефоне и планшете (до 900px): фото целиком по ширине, светлый перелив =====
    Фото не обрезается по бокам и не приближается: ширина 100%, высота по пропорциям 1600×2133,
-   начинается под шапкой (лицо не перекрыто). Низ фото растворяется в студийном фоне (как на компьютере).
-   Текст — на нижней трети фото (ниже торта) и на фоне под ним; затемнение только под текстом. */
+   начинается под шапкой (лицо не перекрыто). Фон — молочный цвет сайта; верх фото чуть-чуть
+   и низ (нижние 30%) плавно растворяются в нём. Текст тёмный, как на остальном сайте, — ниже торта. */
 @media (max-width: 900px) {
   .hero__stage {
     display: block; height: auto; min-height: 0;
     padding-top: var(--header-h);
-    background:
-      radial-gradient(ellipse 80% 55% at 50% 35%, #86817e 0%, rgba(134, 129, 126, 0) 100%),
-      linear-gradient(to bottom, #77726f 0%, #6f6a68 55%, #625d5b 100%);
+    background: var(--bg);
   }
   .hero__photo {
     position: relative; inset: auto; display: block;
     width: 100%; height: auto; aspect-ratio: 1600 / 2133;
     object-fit: cover; object-position: 50% 0;
-    -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
-    mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 7%, #000 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 7%, #000 70%, transparent 100%);
   }
   .hero__shade { display: none; }
-  /* текст заходит на нижние 32% фото (там уже нет торта): 32% × 2133/1600 = 42.66% ширины */
+  /* текст заходит на нижние 14% фото, где оно почти растворилось: 14% × 2133/1600 = 18.66% ширины;
+     под текстом — молочная вуаль, а не тёмное затемнение */
   .hero__content {
-    margin-top: -42.66vw; min-height: 42.66vw;  /* не короче нижней трети фото — фото не выходит за первый экран */
-    padding-top: 44px; padding-bottom: 36px;
-    background: linear-gradient(to bottom, rgba(28, 18, 16, 0) 0, rgba(28, 18, 16, 0.62) 72px, rgba(28, 18, 16, 0.8) 100%);
+    margin-top: -18.66vw; min-height: 18.66vw;
+    padding-top: 52px; padding-bottom: 36px;
+    color: var(--ink); text-shadow: none;
+    /* вуаль становится сплошной до первой строки текста — контраст как на остальном сайте */
+    background: linear-gradient(to bottom, rgba(247, 240, 231, 0) 0, rgba(247, 240, 231, 0.9) 34px, var(--bg) 50px);
   }
+  .hero__eyebrow { color: var(--rose-ink); }
+  .hero__title { color: var(--ink); }
+  .hero__script { color: var(--rose-ink); }
+  .hero .hero__script .decor-underline path { stroke: rgba(154, 76, 88, 0.55); }
+  .hero__lead { color: var(--muted); }
+  /* кнопки как главные на сайте: розовая заливка и тёмный контур */
+  .hero .btn--light { background: var(--rose); color: var(--ink); }
+  .hero .btn--light:hover { background: var(--rose-hover); }
+  .hero .btn--ghost-light { background: transparent; border-color: var(--ink); color: var(--ink); }
+  .hero .btn--ghost-light:hover { background: rgba(42, 32, 28, 0.06); }
+  .hero :focus-visible { outline-color: var(--rose-ink); }
+  /* шапка над молочной полосой — тёмный логотип и меню, как в обычном виде */
+  .header.is-over .logo { color: var(--ink); --logo-halo: var(--bg); }
+  .header.is-over .logo__script { color: var(--rose-ink); }
+  .header.is-over .nav a { color: var(--muted); }
 }
