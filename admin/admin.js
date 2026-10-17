@@ -414,7 +414,7 @@
       view.replaceChildren(
         el("button", { type: "button", class: "btn btn--primary btn--big btn--block", text: KIND[kind].add,
           onclick: () => openEditor(kind, null) }),
-        kind === "fillings" ? categoryPrices() : null,
+        (kind === "fillings" && categoryPrices()) || "",  // у десертов блока нет — пусто, а не «null»
         el("p", { class: "hint", text: "Нажмите на карточку, чтобы поменять цену, описание или фото." }),
         items.length
           ? el("div", { class: "items" }, items.map((it) =>

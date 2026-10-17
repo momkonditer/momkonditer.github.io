@@ -603,6 +603,8 @@ button { font: inherit; color: inherit; }
 .field { display: grid; gap: 6px; }
 .field__label { font-weight: 500; font-size: 14px; }
 .field__opt { font-weight: 300; color: var(--muted); }
+.field__error { font-size: 13px; font-weight: 500; color: var(--rose-ink); }
+.field.has-error .input { border-color: var(--rose-ink); box-shadow: 0 0 0 3px var(--rose-soft); }
 .field--plain { border: 0; margin: 0; padding: 0; min-width: 0; }
 .field--plain legend { padding: 0; margin-bottom: 6px; }
 .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

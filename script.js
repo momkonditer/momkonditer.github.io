@@ -676,6 +676,7 @@
     qty: $("#order-qty"),
     optionField: $("#order-option-field"),
     option: $("#order-option"),
+    optionError: $("#order-option-error"),
     dateBtn: $("#order-date-btn"),
     nearest: $("#order-nearest"),
     cal: $("#order-cal"),
@@ -758,11 +759,25 @@
   f.dateBtn.addEventListener("click", () => toggleCalendar(f.cal.hidden));
 
   /* --- окно --- */
+  let lastOrderKey = "";
+  function setOptionError(on) {
+    f.optionField.classList.toggle("has-error", on);
+    f.optionError.hidden = !on;
+    if (on) f.option.setAttribute("aria-invalid", "true");
+    else f.option.removeAttribute("aria-invalid");
+  }
+
   function openOrder(order, from) {
     current = order;
     opener = from || null;
     manualShown = false;
     f.manual.hidden = true;
+    setOptionError(false);
+    // пожелания по декору относятся к конкретному товару: у другого товара — чистое поле
+    // (дата, время и способ получения остаются)
+    const orderKey = `${order.type}:${order.item.id}`;
+    if (orderKey !== lastOrderKey) f.wishes.value = "";
+    lastOrderKey = orderKey;
 
     const isFilling = order.type === "filling";
     const item = order.item;
@@ -899,7 +914,17 @@
   }
 
   // <a href="t.me/..."> — переход происходит сам, здесь только копируем текст
+  f.option.addEventListener("change", () => { if (f.option.value) setOptionError(false); });
+
   f.send.addEventListener("click", (e) => {
+    // у десерта есть начинки на выбор — без выбора заявку не отправляем
+    if (!f.optionField.hidden && !f.option.value) {
+      e.preventDefault();
+      setOptionError(true);
+      f.option.focus();
+      showToast("Выберите начинку");
+      return;
+    }
     const text = buildText();
     f.manualText.value = text;
 
