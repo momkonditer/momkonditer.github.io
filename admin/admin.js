@@ -227,16 +227,21 @@
     }
   }
 
+  // Номер перехода: опоздавший ответ рисует экран, только если пользователь всё ещё на том разделе,
+  // который его запросил (иначе «Десерты» могли нарисоваться под заголовком «Отзывы»)
+  let routeSeq = 0;
+
   function withData(render) {
     if (state.data) return render();
+    const seq = routeSeq;
     view.replaceChildren(loader());
     api("adminData")
       .then((d) => {
         state.data = d;
-        render();
+        if (seq === routeSeq) render();
       })
       .catch((e) => {
-        if (!isLoggedIn()) return;
+        if (!isLoggedIn() || seq !== routeSeq) return;
         view.replaceChildren(errorPanel(errorText(e), () => withData(render)));
       });
   }
@@ -295,6 +300,7 @@
   backBtn.addEventListener("click", () => (location.hash = "#/"));
 
   function route() {
+    routeSeq++;
     currentHash = location.hash || "#/";
     dirtyCheck = null;
     if (!isLoggedIn()) return renderLogin();
