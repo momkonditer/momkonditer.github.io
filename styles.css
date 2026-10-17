@@ -779,38 +779,43 @@ textarea.input { resize: vertical; }
   .hero__actions { flex-wrap: wrap; }
 }
 
-/* ===== Первый экран на телефоне и планшете (до 900px): фото целиком по ширине, светлый перелив =====
+/* ===== Первый экран на телефоне и планшете (до 900px): фото целиком по ширине, латте-перелив =====
    Фото не обрезается по бокам и не приближается: ширина 100%, высота по пропорциям 1600×2133,
-   начинается под шапкой (лицо не перекрыто). Фон — молочный цвет сайта; верх фото чуть-чуть
-   и низ (нижние 30%) плавно растворяются в нём. Текст тёмный, как на остальном сайте, — ниже торта. */
+   начинается сразу под шапкой с ровной границей. Низ фото (нижние 30%) плавно растворяется
+   в тёплом «кофе с молоком», который ниже, под кнопками, переходит в обычный фон сайта.
+   Текст тёмный, как на остальном сайте, — ниже торта. */
 @media (max-width: 900px) {
   .hero__stage {
     display: block; height: auto; min-height: 0;
     padding-top: var(--header-h);
-    background: var(--bg);
+    --hero-latte: #e3d3c2;  /* светлый кофе с молоком — мягко сходится с серым фоном фото */
+    /* полоса под шапкой — обычный фон сайта, за фото и текстом — латте */
+    background: linear-gradient(to bottom, var(--bg) 0, var(--bg) var(--header-h), var(--hero-latte) var(--header-h));
   }
   .hero__photo {
     position: relative; inset: auto; display: block;
     width: 100%; height: auto; aspect-ratio: 1600 / 2133;
     object-fit: cover; object-position: 50% 0;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 7%, #000 70%, transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0, #000 7%, #000 70%, transparent 100%);
+    /* сверху — ровная граница, растворяются только нижние 30% */
+    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
   }
   .hero__shade { display: none; }
   /* текст заходит на нижние 14% фото, где оно почти растворилось: 14% × 2133/1600 = 18.66% ширины;
-     под текстом — молочная вуаль, а не тёмное затемнение */
+     под текстом — вуаль цвета латте (не тёмное затемнение), к низу экрана — переход в обычный фон сайта */
   .hero__content {
     margin-top: -18.66vw; min-height: 18.66vw;
     padding-top: 52px; padding-bottom: 36px;
     color: var(--ink); text-shadow: none;
-    /* вуаль становится сплошной до первой строки текста — контраст как на остальном сайте */
-    background: linear-gradient(to bottom, rgba(247, 240, 231, 0) 0, rgba(247, 240, 231, 0.9) 34px, var(--bg) 50px);
+    /* вуаль становится сплошной до первой строки текста, а под кнопками — переходит в фон сайта */
+    background: linear-gradient(to bottom, rgba(227, 211, 194, 0) 0, rgba(227, 211, 194, 0.9) 34px, var(--hero-latte) 50px, var(--hero-latte) 55%, var(--bg) 100%);
   }
-  .hero__eyebrow { color: var(--rose-ink); }
+  /* на латте акцент и описание чуть темнее обычного — контраст не ниже 4.5:1 */
+  .hero__eyebrow { color: #8c4350; }
   .hero__title { color: var(--ink); }
-  .hero__script { color: var(--rose-ink); }
+  .hero__script { color: #8c4350; }
   .hero .hero__script .decor-underline path { stroke: rgba(154, 76, 88, 0.55); }
-  .hero__lead { color: var(--muted); }
+  .hero__lead { color: #574a43; }
   /* кнопки как главные на сайте: розовая заливка и тёмный контур */
   .hero .btn--light { background: var(--rose); color: var(--ink); }
   .hero .btn--light:hover { background: var(--rose-hover); }
