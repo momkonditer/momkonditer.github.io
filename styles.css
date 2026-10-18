@@ -815,7 +815,7 @@ textarea.input { resize: vertical; }
 /* ===== Первый экран на телефоне и планшете (до 900px): фото по ширине, низ мягко «молочнеет» =====
    Фото на всю ширину (по бокам не режется), по высоте — до 75% экрана (но не меньше 440px):
    лишнее срезается снизу, на уровне низа пиджака; лицо, торт и руки видны целиком.
-   Поверх нижних ~30% фото — полупрозрачный молочный перелив (фото под ним остаётся, без маски).
+   Поверх нижней половины фото — длинный полупрозрачный молочный перелив (фото под ним остаётся).
    Текст начинается ниже торта, примерно на 71% высоты экрана; заголовок чуть заходит на фото. */
 @media (max-width: 900px) {
   .hero__stage {
@@ -831,11 +831,19 @@ textarea.input { resize: vertical; }
     position: relative; inset: auto; display: block;
     width: 100%; height: var(--hero-ph);
     object-fit: cover; object-position: center top;
+    /* последние ~12% фото плавно уходят в прозрачность — у нижнего края картинки нет линии */
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 88%, rgba(0, 0, 0, 0.85) 91%, rgba(0, 0, 0, 0.55) 94%, rgba(0, 0, 0, 0.25) 97%, rgba(0, 0, 0, 0) 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 88%, rgba(0, 0, 0, 0.85) 91%, rgba(0, 0, 0, 0.55) 94%, rgba(0, 0, 0, 0.25) 97%, rgba(0, 0, 0, 0) 100%);
   }
-  /* молочный перелив поверх нижних 30% фото: от прозрачного к #fffaf5, без видимого начала */
+  /* молочный перелив: с середины фото (сразу под тортом) медленно нарастает к низу и заходит
+     на 26px ниже края фото, перекрывая стык; внизу — ровно #fffaf5, как фон под текстом */
   .hero__shade {
-    display: block; inset: auto 0; top: calc(var(--header-h) + var(--hero-ph) * 0.7); height: calc(var(--hero-ph) * 0.3 + 1px);
-    background: linear-gradient(to bottom, rgba(255, 250, 245, 0) 0%, rgba(255, 250, 245, 0.25) 35%, rgba(255, 250, 245, 0.6) 65%, rgba(255, 250, 245, 0.88) 85%, #fffaf5 100%);
+    display: block; inset: auto 0; top: calc(var(--header-h) + var(--hero-ph) * 0.5); height: calc(var(--hero-ph) * 0.5 + 26px);
+    background: linear-gradient(to bottom,
+      rgba(255, 250, 245, 0) 0%, rgba(255, 250, 245, 0.04) 12%, rgba(255, 250, 245, 0.1) 24%,
+      rgba(255, 250, 245, 0.2) 36%, rgba(255, 250, 245, 0.33) 48%, rgba(255, 250, 245, 0.48) 60%,
+      rgba(255, 250, 245, 0.64) 71%, rgba(255, 250, 245, 0.79) 81%, rgba(255, 250, 245, 0.91) 90%,
+      rgba(255, 250, 245, 0.98) 96%, #fffaf5 100%);
   }
   .hero__shade::before { content: none; }
   /* текст — с ~71% высоты экрана (но заходит на фото хотя бы на 40px); под ним молочная подложка без краёв */
@@ -846,8 +854,12 @@ textarea.input { resize: vertical; }
     isolation: isolate;
   }
   .hero__content::before {
-    content: ""; position: absolute; z-index: -1; left: 0; right: 0; top: -40px; height: 160px;
-    background: linear-gradient(to bottom, rgba(255, 250, 245, 0) 0, rgba(255, 250, 245, 0.5) 18px, rgba(255, 250, 245, 0.85) 34px, rgba(255, 250, 245, 0.96) 48px, var(--hero-milk) 80px);
+    /* длинная (150px) и медленно нарастающая — не видно, где начинается; к первой строке почти сплошная */
+    content: ""; position: absolute; z-index: -1; left: 0; right: 0; top: -150px; height: 260px;
+    background: linear-gradient(to bottom,
+      rgba(255, 250, 245, 0) 0, rgba(255, 250, 245, 0.05) 30px, rgba(255, 250, 245, 0.15) 60px,
+      rgba(255, 250, 245, 0.3) 85px, rgba(255, 250, 245, 0.5) 105px, rgba(255, 250, 245, 0.7) 120px,
+      rgba(255, 250, 245, 0.85) 132px, rgba(255, 250, 245, 0.95) 142px, rgba(255, 250, 245, 0.98) 150px, var(--hero-milk) 165px);
     pointer-events: none;
   }
   /* на молочном акцент и описание чуть темнее обычного — контраст не ниже 4.5:1 */
