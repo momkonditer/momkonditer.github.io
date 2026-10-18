@@ -731,6 +731,8 @@ textarea.input { resize: vertical; }
   .card--filling .photo--round { width: min(100%, calc((100% + 32px) * 0.88)); }
   .steps { grid-template-columns: repeat(2, 1fr); }
   .panels { grid-template-columns: repeat(2, 1fr); }
+  .panels:has(> .panel[hidden]) { grid-template-columns: 1fr; }
+  .panels--one-promo { grid-template-columns: 3fr 2fr; }  /* одна акция — карточка «Бонусы» уже, без пустоты */  /* «Бонусов» нет — «Условия» на всю ширину */
   .contacts__row { grid-template-columns: 140px 1fr; align-items: baseline; }
 
   .sheet {

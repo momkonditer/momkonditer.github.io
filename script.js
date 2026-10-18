@@ -314,6 +314,9 @@
     ].filter((p) => p.text);
     $("#promos-list").replaceChildren(...promos.map((p) =>
       el("li", {}, [el("strong", { text: p.title }), el("span", { text: p.text })])));
+    // акций нет совсем — прячем карточку «Бонусы», «Условия» встают на всю ширину
+    $("#promos-list").closest(".panel").hidden = !promos.length;
+    $("#terms .panels").classList.toggle("panels--one-promo", promos.length === 1);
   }
 
   /* ================= Начинки ================= */
