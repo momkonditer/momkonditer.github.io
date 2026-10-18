@@ -42,9 +42,15 @@
 
   function handle(value, re) {
     const s = String(value || "").trim()
-      .replace(/^https?:\/\/(www\.)?(t\.me|telegram\.me|instagram\.com)\//i, "")
+      .replace(/^(https?:\/\/)?(www\.)?(t\.me|telegram\.me|instagram\.com|ig\.me\/m)\//i, "")
       .replace(/^@/, "").replace(/[/?#].*$/, "");
     return re.test(s) ? s : "";
+  }
+
+  // MAX: ссылка на профиль или чат (https://max.ru/…); не ссылка на MAX — кнопки нет
+  function maxLink(value) {
+    const s = String(value || "").trim().replace(/^(https?:\/\/)?/i, "https://");
+    return /^https:\/\/([a-z0-9-]+\.)*max\.ru(\/\S*)?$/i.test(s) ? s : "";
   }
 
   function phoneHref(phone) {
@@ -62,13 +68,15 @@
       if (v !== null && v !== undefined) s[k] = v;
     });
 
-    const tg = handle(s.telegram, /^[A-Za-z0-9_]{3,64}$/) || handle(fb.settings.telegram, /^\w+$/);
-    const ig = handle(s.instagram, /^[A-Za-z0-9_.]{1,64}$/) || handle(fb.settings.instagram, /^[\w.]+$/);
+    // Мессенджеры: пустое поле в таблице — кнопки этого мессенджера нет нигде; с ошибкой — берём из data.js
+    const msgr = (key, parse) => (String(s[key] || "").trim() ? parse(s[key]) || parse(fb.settings[key]) : "");
+    const tg = msgr("telegram", (v) => handle(v, /^[A-Za-z0-9_]{3,64}$/));
+    const ig = msgr("instagram", (v) => handle(v, /^[A-Za-z0-9_.]{1,64}$/));
     const contacts = {
-      telegram: `https://t.me/${tg}`,
-      telegramLabel: `@${tg}`,
-      instagram: `https://instagram.com/${ig}`,
-      instagramLabel: `@${ig}`,
+      // Instagram — сразу в личные сообщения (ig.me/m/…)
+      links: { telegram: tg && `https://t.me/${tg}`, instagram: ig && `https://ig.me/m/${ig}`, max: msgr("max", maxLink) },
+      telegramLabel: tg && `@${tg}`,
+      instagramLabel: ig && `@${ig}`,
       phone: String(s.phone || ""),
       phoneHref: phoneHref(s.phone),
       pickupAddress: String(s.address || ""),
@@ -277,8 +285,16 @@
   function renderInfo() {
     const C = D.contacts;
     const values = Object.assign({ city: "Электросталь" }, C);
-    $$("[data-tg]").forEach((a) => (a.href = C.telegram));
-    $$("[data-ig]").forEach((a) => (a.href = C.instagram));
+    $$("[data-msg]").forEach((a) => {
+      const href = C.links[a.dataset.msg];
+      a.hidden = !href;
+      if (href) a.href = href;
+      else a.removeAttribute("href");
+    });
+    $$("[data-msg-row]").forEach((r) => (r.hidden = !C.links[r.dataset.msgRow]));
+    // ни одного мессенджера — кнопки «Написать» не показываем
+    const anyMsgr = Object.values(C.links).some(Boolean);
+    $$("[data-msg-open]").forEach((b) => (b.hidden = !anyMsgr));
     $$("[data-phone]").forEach((a) => (C.phoneHref ? (a.href = C.phoneHref) : a.removeAttribute("href")));
     $$("[data-text]").forEach((n) => (n.textContent = values[n.dataset.text] || ""));
     $$("[data-setting]").forEach((n) => (n.textContent = D[n.dataset.setting]));
@@ -680,7 +696,8 @@
     time: $("#order-time"),
     totalBox: $("#order-total-box"),
     total: $("#order-total"),
-    send: $("#order-send"),
+    send: $$("[data-send]"),
+    hint: $("#order-hint"),
     manual: $("#order-manual"),
     manualText: $("#order-manual-text"),
   };
@@ -768,6 +785,8 @@
     opener = from || null;
     manualShown = false;
     f.manual.hidden = true;
+    f.hint.textContent = HINT_BEFORE;
+    f.hint.classList.remove("is-done");
     setOptionError(false);
     // пожелания по декору относятся к конкретному товару: у другого товара — чистое поле
     // (дата, время и способ получения остаются)
@@ -799,7 +818,6 @@
     f.weightLabel.textContent = isFilling ? "Вес торта" : "Вес";
     f.qtyField.hidden = isFilling || item.unit !== "шт";
     f.totalBox.hidden = !(isFilling || (item.price && (item.unit === "шт" || item.unit === "кг")));
-    f.send.href = D.contacts.telegram;
     toggleCalendar(false);
     updateWeight();
     updateDate();
@@ -909,10 +927,18 @@
     showToast("Скопируйте текст заявки вручную");
   }
 
-  // <a href="t.me/..."> — переход происходит сам, здесь только копируем текст
   f.option.addEventListener("change", () => { if (f.option.value) setOptionError(false); });
 
-  f.send.addEventListener("click", (e) => {
+  // Кнопки мессенджеров — ссылки <a href>: переход происходит сам, здесь только копируем текст
+  const HINT_BEFORE = "Текст заявки скопируется автоматически.";
+  const COPIED = "Заявка скопирована — вставьте её в чат и отправьте";
+  function copied() {
+    showToast(COPIED);
+    f.hint.textContent = COPIED;
+    f.hint.classList.add("is-done");
+  }
+
+  f.send.forEach((btn) => btn.addEventListener("click", (e) => {
     // у десерта есть начинки на выбор — без выбора заявку не отправляем
     if (!f.optionField.hidden && !f.option.value) {
       e.preventDefault();
@@ -925,26 +951,81 @@
     f.manualText.value = text;
 
     if (canClipboard) {
-      navigator.clipboard.writeText(text).then(
-        () => showToast("Заявка скопирована. Вставьте её в чат и отправьте"),
-        () => (legacyCopy(text) ? showToast("Заявка скопирована. Вставьте её в чат и отправьте") : showManual(text))
-      );
+      navigator.clipboard.writeText(text).then(copied, () => (legacyCopy(text) ? copied() : showManual(text)));
       return;
     }
     if (legacyCopy(text)) {
-      showToast("Заявка скопирована. Вставьте её в чат и отправьте");
+      copied();
       return;
     }
-    // Скопировать не удалось: сначала показываем текст, повторное нажатие уже просто откроет Telegram
+    // Скопировать не удалось: сначала показываем текст, повторное нажатие уже просто откроет мессенджер
     showManual(text);
     if (!manualShown) {
       manualShown = true;
       e.preventDefault();
     }
+  }));
+
+  /* ================= «Написать»: выбор мессенджера ================= */
+  // На телефоне — панель снизу, на компьютере — выпадающее меню у нажатой кнопки.
+  // Закрывается по тапу мимо (подложка), Esc, выбору мессенджера, а на компьютере ещё и при прокрутке.
+  const menu = $("#msg-menu");
+  const menuPanel = $(".msg-menu__panel", menu);
+  const wide = window.matchMedia("(min-width: 640px)");
+  let menuOpener = null;
+  let menuTimer = 0;
+
+  function placeMenu() {
+    menuPanel.style.cssText = "";
+    if (!wide.matches || !menuOpener) return;
+    const r = menuOpener.getBoundingClientRect();
+    const w = menuPanel.offsetWidth, h = menuPanel.offsetHeight;
+    const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+    // под кнопкой, а если внизу не помещается (плавающая кнопка) — над ней; по краю кнопки, не за экраном
+    const top = r.bottom + 8 + h <= vh - 8 ? r.bottom + 8 : Math.max(8, r.top - 8 - h);
+    const left = Math.min(Math.max(8, r.left + r.width / 2 > vw / 2 ? r.right - w : r.left), vw - w - 8);
+    menuPanel.style.top = `${top}px`;
+    menuPanel.style.left = `${left}px`;
+  }
+
+  function openMenu(btn) {
+    clearTimeout(menuTimer);
+    menuOpener = btn;
+    menu.hidden = false;
+    placeMenu();
+    btn.setAttribute("aria-expanded", "true");
+    requestAnimationFrame(() => menu.classList.add("is-open"));
+    const first = $$(".msg-menu__item", menu).find((a) => !a.hidden);
+    if (first) first.focus({ preventScroll: true });
+  }
+
+  function closeMenu(returnFocus) {
+    if (menu.hidden) return;
+    menu.classList.remove("is-open");
+    if (menuOpener) {
+      menuOpener.setAttribute("aria-expanded", "false");
+      if (returnFocus) menuOpener.focus({ preventScroll: true });
+    }
+    menuOpener = null;
+    menuTimer = setTimeout(() => (menu.hidden = true), 200);
+  }
+
+  $$("[data-msg-open]").forEach((b) => b.addEventListener("click", () => {
+    if (menuOpener === b) closeMenu(false);
+    else openMenu(b);
+  }));
+  $("[data-msg-close]", menu).addEventListener("click", () => closeMenu(false));
+  $$(".msg-menu__item", menu).forEach((a) => a.addEventListener("click", () => closeMenu(false)));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && menuOpener) closeMenu(true); });
+  // фокус ушёл из меню (Tab) — закрываем
+  menuPanel.addEventListener("focusout", (e) => {
+    if (e.relatedTarget && !menuPanel.contains(e.relatedTarget)) closeMenu(false);
   });
+  window.addEventListener("scroll", () => { if (menuOpener && wide.matches) closeMenu(false); }, { passive: true });
+  window.addEventListener("resize", () => closeMenu(false));
 
   /* ================= Плавающая кнопка «Заказать» ================= */
-  // Появляется, когда первый экран пролистан; прячется у вопросов, контактов и футера — там своя кнопка Telegram
+  // Появляется, когда первый экран пролистан; прячется у вопросов, контактов и футера — там свои кнопки мессенджеров
   const fab = $(".fab");
   const heroStage = $(".hero__stage");
   const fabHideZones = ["#faq", "#contacts", ".footer"].map((s) => $(s)).filter(Boolean);

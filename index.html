@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MOM кондитер — домашние торты и десерты на заказ в Электростали</title>
-  <meta name="description" content="Домашние торты и десерты на заказ в Электростали. 20+ начинок с фото в разрезе, бенто, капкейки, трайфлы. Заказ в Telegram.">
+  <meta name="description" content="Домашние торты и десерты на заказ в Электростали. 20+ начинок с фото в разрезе, бенто, капкейки, трайфлы. Заказ в Telegram или Instagram.">
   <meta name="theme-color" content="#f6efe6">
 
   <!-- Превью ссылки в Telegram / Инстаграме.
@@ -15,7 +15,7 @@
   <meta property="og:title" content="MOM кондитер — торты на заказ в Электростали">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <meta property="og:description" content="Домашние торты и десерты из натуральных продуктов. Выберите начинку и напишите Марине в Telegram.">
+  <meta property="og:description" content="Домашние торты и десерты из натуральных продуктов. Выберите начинку и напишите Марине в удобный мессенджер.">
   <meta property="og:image" content="images/og.jpg">
   <meta name="twitter:card" content="summary_large_image">
 
@@ -25,9 +25,16 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Playfair+Display:ital,wght@1,400;1,500&amp;family=Montserrat:wght@800&amp;display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Playfair+Display:ital,wght@1,400;1,500&amp;family=Montserrat:wght@800&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=29">
+  <link rel="stylesheet" href="styles.css?v=30">
 </head>
 <body>
+  <!-- Иконки мессенджеров: монохромные, цвет берут у кнопки (currentColor) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-tg" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round" d="M21 4.5 3.2 11.4c-.9.4-.8 1.1.1 1.4l4.4 1.4 1.7 5.3c.2.6.8.7 1.2.3l2.5-2.3 4.6 3.4c.6.4 1.3.1 1.4-.6L21.9 5.6c.2-.9-.3-1.4-.9-1.1Z M7.7 14.2l9.8-6.4-7.1 7.6"/></symbol>
+    <symbol id="i-ig" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="3.9"/></g><circle cx="16.9" cy="7.1" r="1.1" fill="currentColor"/></symbol>
+    <symbol id="i-max" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M12 3.6c-4.7 0-8.4 3.5-8.4 8.1 0 1.9.6 3.6 1.7 5l-.9 3.6 3.8-1.3c1.1.5 2.4.8 3.8.8 4.7 0 8.4-3.5 8.4-8.1S16.7 3.6 12 3.6Z"/><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M8.4 14.3V9.5l3.6 3.4 3.6-3.4v4.8"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.6 4v-4H6.5A2.5 2.5 0 0 1 4 13.5Z"/><g fill="currentColor"><circle cx="8.5" cy="9.6" r="1.1"/><circle cx="12" cy="9.6" r="1.1"/><circle cx="15.5" cy="9.6" r="1.1"/></g></symbol>
+  </svg>
   <a class="skip-link" href="#fillings">К начинкам</a>
 
   <header class="header is-over">
@@ -41,7 +48,7 @@
         <a href="#faq">Вопросы</a>
         <a href="#contacts">Контакты</a>
       </nav>
-      <a class="btn btn--primary btn--sm" data-tg href="#contacts" target="_blank" rel="noopener">Написать</a>
+      <button class="btn btn--primary btn--sm" type="button" data-msg-open aria-haspopup="dialog" aria-expanded="false" aria-controls="msg-menu">Написать</button>
     </div>
   </header>
 
@@ -58,7 +65,7 @@
           <p class="hero__lead">Привет! Я Марина — мамаКондитер. Пеку из натуральных продуктов и делаю каждый торт индивидуально. Выберите начинку — и напишите мне, обсудим дизайн.</p>
           <div class="hero__actions">
             <a class="btn btn--light" href="#fillings">Выбрать начинку</a>
-            <a class="btn btn--ghost-light" data-tg href="#contacts" target="_blank" rel="noopener">Написать в Telegram</a>
+            <button class="btn btn--ghost-light" type="button" data-msg-open aria-haspopup="dialog" aria-expanded="false" aria-controls="msg-menu">Написать</button>
           </div>
         </div>
       </div>
@@ -89,7 +96,7 @@
         <h2 class="section__title" id="how-title">Как заказать</h2>
         <ol class="steps">
           <li class="step"><span class="step__num">1</span><h3>Выберите начинку</h3><p>Посмотрите разрезы и нажмите «Заказать» на понравившейся.</p></li>
-          <li class="step"><span class="step__num">2</span><h3>Отправьте заявку в Telegram</h3><p>Укажите дату и время, вес, начинку, декор, доставку или самовывоз. Текст заявки скопируется сам — останется вставить его в чат.</p></li>
+          <li class="step"><span class="step__num">2</span><h3>Отправьте заявку в мессенджер</h3><p>Укажите дату и время, вес, начинку, декор, доставку или самовывоз. Текст заявки скопируется сам — останется вставить его в чат.</p></li>
           <li class="step"><span class="step__num">3</span><h3>Согласуйте дизайн</h3><p>Обсудим декор и детали, затем вносится предоплата <span data-setting="prepayment">50</span>%.</p></li>
           <li class="step"><span class="step__num">4</span><h3>Заберите торт</h3><p>Самовывоз или доставка по Электростали.</p></li>
         </ol>
@@ -170,15 +177,16 @@
       <div class="container">
         <h2 class="section__title" id="contacts-title">Как со мной <span class="accent-word">связаться</span></h2>
         <dl class="contacts">
-          <div class="contacts__row"><dt>Telegram</dt><dd><a data-tg data-text="telegramLabel" target="_blank" rel="noopener"></a></dd></div>
+          <div class="contacts__row" data-msg-row="telegram"><dt>Telegram</dt><dd><a data-msg="telegram" data-text="telegramLabel" target="_blank" rel="noopener"></a></dd></div>
           <div class="contacts__row"><dt>Телефон</dt><dd><a data-phone data-text="phone"></a></dd></div>
-          <div class="contacts__row"><dt>Instagram</dt><dd><a data-ig data-text="instagramLabel" target="_blank" rel="noopener"></a></dd></div>
+          <div class="contacts__row" data-msg-row="instagram"><dt>Instagram</dt><dd><a data-msg="instagram" data-text="instagramLabel" target="_blank" rel="noopener"></a></dd></div>
           <div class="contacts__row"><dt>Самовывоз</dt><dd class="selectable" data-text="pickupAddress"></dd></div>
           <div class="contacts__row"><dt>Доставка</dt><dd data-text="delivery"></dd></div>
         </dl>
         <div class="contacts__actions">
-          <a class="btn btn--primary" data-tg target="_blank" rel="noopener">Написать в Telegram</a>
-          <a class="btn btn--outline" data-ig target="_blank" rel="noopener">Instagram</a>
+          <a class="btn btn--primary" data-msg="telegram" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Telegram</a>
+          <a class="btn btn--primary" data-msg="instagram" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-ig"/></svg>Instagram</a>
+          <a class="btn btn--primary" data-msg="max" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-max"/></svg>MAX</a>
         </div>
       </div>
     </section>
@@ -188,16 +196,28 @@
     <div class="container footer__inner">
       <a class="logo" href="#top" aria-label="MOM кондитер — наверх"><span class="logo__mom">MOM</span><span class="logo__script" data-logo="кондитер">кондитер</span></a>
       <p>Домашние торты и десерты на заказ · <span data-text="city"></span></p>
-      <p class="footer__links"><a data-tg target="_blank" rel="noopener">Telegram</a><span aria-hidden="true"> · </span><a data-ig target="_blank" rel="noopener">Instagram</a></p>
-      <p class="footer__small">Заказ, оплата и детали — в личной переписке в Telegram.</p>
+      <!-- точки между ссылками ставит CSS — пропавший мессенджер не оставит лишнюю «·» -->
+      <p class="footer__links"><a data-msg="telegram" target="_blank" rel="noopener">Telegram</a><a data-msg="instagram" target="_blank" rel="noopener">Instagram</a><a data-msg="max" target="_blank" rel="noopener">MAX</a></p>
+      <p class="footer__small">Заказ, оплата и детали — в личной переписке в мессенджере.</p>
       <p class="footer__small footer__copy">© 2026 MOM кондитер</p>
     </div>
   </footer>
 
-  <a class="fab is-hidden" data-tg href="#contacts" target="_blank" rel="noopener" aria-label="Заказать в Telegram">
-    <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M21.4 4.6 2.9 11.7c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.9-1.4-1.5ZM8.3 14.4l9.6-6.1c.5-.3.9-.1.5.2l-8.1 7.3-.3 3.3-1.7-4.7Z"/></svg>
-    <span>Заказать</span>
-  </a>
+  <button class="fab is-hidden" type="button" data-msg-open aria-haspopup="dialog" aria-expanded="false" aria-controls="msg-menu">
+    <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-chat"/></svg>
+    <span>Написать</span>
+  </button>
+
+  <!-- Выбор мессенджера («Написать»): снизу на телефоне, выпадающее меню на компьютере. Пустой мессенджер в настройках — пункта нет -->
+  <div class="msg-menu" id="msg-menu" hidden>
+    <div class="msg-menu__backdrop" data-msg-close></div>
+    <div class="msg-menu__panel" role="dialog" aria-labelledby="msg-menu-title">
+      <p class="msg-menu__title" id="msg-menu-title">Где вам удобнее написать?</p>
+      <a class="msg-menu__item" data-msg="telegram" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg>Telegram</a>
+      <a class="msg-menu__item" data-msg="instagram" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-ig"/></svg>Instagram</a>
+      <a class="msg-menu__item" data-msg="max" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-max"/></svg>MAX</a>
+    </div>
+  </div>
 
   <!-- Окно заявки -->
   <dialog class="sheet" id="order" aria-labelledby="order-title">
@@ -266,8 +286,15 @@
         <small>Декор считается отдельно</small>
       </div>
 
-      <a class="btn btn--primary btn--block" id="order-send" target="_blank" rel="noopener">Скопировать заявку и открыть Telegram</a>
-      <p class="sheet__hint">Текст скопируется автоматически. В чате нажмите «Вставить» и отправьте.</p>
+      <div class="send">
+        <p class="send__label" id="send-label">Куда отправить заявку?</p>
+        <div class="send__row" role="group" aria-labelledby="send-label">
+          <a class="btn btn--primary send__btn" data-msg="telegram" data-send target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-tg"/></svg><span>Telegram</span></a>
+          <a class="btn btn--primary send__btn" data-msg="instagram" data-send target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-ig"/></svg><span>Instagram</span></a>
+          <a class="btn btn--primary send__btn" data-msg="max" data-send target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-max"/></svg><span>MAX</span></a>
+        </div>
+      </div>
+      <p class="sheet__hint" id="order-hint" aria-live="polite">Текст заявки скопируется автоматически.</p>
 
       <div class="manual" id="order-manual" hidden>
         <label class="field__label" for="order-manual-text">Скопируйте текст заявки и отправьте его в чат:</label>
@@ -292,9 +319,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=18"></script>
+  <script src="data.js?v=19"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=20"></script>
+  <script src="script.js?v=21"></script>
   <!-- Декор: переключатели в data.js → decor -->
   <script src="decor.js?v=13"></script>
 </body>

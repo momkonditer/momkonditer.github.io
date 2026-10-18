@@ -1038,10 +1038,11 @@
     { key: "promoFirst", label: "Подарок за первый заказ — подробно", textarea: true, hint: "Показывается в блоке «Условия и бонусы». Если стереть текст, акция пропадёт с сайта." },
     { key: "promoFriend", label: "Акция «Приведи друга»", textarea: true, hint: "Если стереть текст, акция пропадёт с сайта." },
     { group: "Контакты" },
-    { key: "telegram", label: "Telegram", hint: "Ваш ник, например @matveevam87. Сюда приходят заявки с сайта.", required: true },
+    { key: "telegram", label: "Telegram", hint: "Ваш ник, например @matveevam87. Если стереть — кнопки Telegram на сайте не будет." },
     { key: "phone", label: "Телефон", type: "tel", hint: "Как показывать на сайте, например +7 (916) 501-57-28." },
     { key: "address", label: "Адрес самовывоза", hint: "Откуда забирают торты." },
-    { key: "instagram", label: "Instagram", hint: "Ник, например @momdesertmarina." },
+    { key: "instagram", label: "Instagram", hint: "Ник, например @momdesertmarina. Кнопка на сайте откроет личные сообщения. Если стереть — кнопки не будет." },
+    { key: "max", label: "MAX", hint: "Ссылка на ваш профиль в MAX, например https://max.ru/… Если поле пустое — кнопки MAX на сайте нет." },
     { key: "delivery", label: "Доставка", hint: "Например: Доставка только по Электростали." },
     { group: "Заказы" },
     { key: "minWeight", label: "Минимальный вес торта, кг", number: true, hint: "Меньше этого веса на сайте выбрать нельзя. Например 2 или 1,5." },
@@ -1050,6 +1051,22 @@
     { key: "cancelDays", label: "Отмена заказа: за сколько дней", number: true, whole: true,
       hint: "Если клиент отказывается позже чем за столько дней до выдачи, предоплата не возвращается. Например 2." },
   ];
+
+  // Мессенджеры: пустое поле — кнопки на сайте нет; хотя бы один должен быть заполнен
+  const MESSENGERS = ["telegram", "instagram", "max"];
+  function messengerValue(key, raw) {
+    if (!raw) return { value: "" };
+    if (key === "max") {
+      const link = raw.replace(/^(https?:\/\/)?/i, "https://");
+      return /^https:\/\/([a-z0-9-]+\.)*max\.ru(\/\S*)?$/i.test(link) ? { value: link }
+        : { value: raw, err: "Вставьте ссылку из MAX, она начинается с https://max.ru/" };
+    }
+    const nick = raw.replace(/^(https?:\/\/)?(www\.)?(t\.me|telegram\.me|instagram\.com|ig\.me\/m)\//i, "")
+      .replace(/^@/, "").replace(/[/?#].*$/, "");
+    const ok = key === "telegram" ? /^[A-Za-z0-9_]{3,64}$/.test(nick) : /^[A-Za-z0-9_.]{1,64}$/.test(nick);
+    return ok ? { value: "@" + nick }
+      : { value: raw, err: "Напишите ник латинскими буквами, например " + (key === "telegram" ? "@matveevam87." : "@momdesertmarina.") };
+  }
 
   function renderSettings() {
     setTitle("Акции и контакты");
@@ -1066,7 +1083,7 @@
         const input = d.textarea
           ? el("textarea", { class: "input", rows: "3", maxlength: "500" })
           : el("input", { class: "input", type: d.type || "text", maxlength: "200",
-            inputmode: d.number ? "decimal" : null, autocapitalize: d.key === "telegram" || d.key === "instagram" ? "none" : null });
+            inputmode: d.number ? "decimal" : null, autocapitalize: MESSENGERS.includes(d.key) ? "none" : null });
         input.value = value;
         inputs[d.key] = input;
         fields[d.key] = field(d.label, input, d.hint, `s-${d.key}`);
@@ -1091,16 +1108,20 @@
             if (n === null || isNaN(n)) err = "Напишите число, например " + (d.key === "minWeight" ? "2" : d.key === "prepayment" ? "50" : "0") + ".";
             else if (d.whole && !Number.isInteger(n)) err = "Напишите целое число дней, например 2.";
             values[d.key] = n;
-          } else if (d.key === "telegram") {
-            const nick = raw.replace(/^https?:\/\/(www\.)?t\.me\//i, "").replace(/^@/, "");
-            if (!/^[A-Za-z0-9_]{3,64}$/.test(nick)) err = "Напишите ник латинскими буквами, например @matveevam87.";
-            values[d.key] = "@" + nick;
+          } else if (MESSENGERS.includes(d.key)) {
+            const m = messengerValue(d.key, raw);
+            err = m.err || "";
+            values[d.key] = m.value;
           } else {
             values[d.key] = raw;
           }
           setFieldError(fields[d.key], err);
           if (err && !firstBad) firstBad = inputs[d.key];
         });
+        if (!firstBad && !MESSENGERS.some((k) => values[k])) {
+          setFieldError(fields.telegram, "Заполните хотя бы один мессенджер — иначе клиентам некуда будет написать.");
+          firstBad = inputs.telegram;
+        }
         if (firstBad) {
           firstBad.focus();
           saveMsg.textContent = "Проверьте поля, отмеченные красным.";
@@ -1110,7 +1131,7 @@
         const ok = await runSave(saveBtn, saveMsg, async () => {
           const res = await api("saveSettings", { values });
           state.data.settings = res.settings;
-          if (values.telegram) inputs.telegram.value = values.telegram;
+          MESSENGERS.forEach((k) => (inputs[k].value = values[k]));
           saved = snapshot();
         });
         if (ok) toast("Сохранено ✓");
