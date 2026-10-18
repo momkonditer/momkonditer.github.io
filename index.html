@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>MOM кондитер — домашние торты и десерты на заказ в Электростали</title>
-  <meta name="description" content="Домашние торты и десерты на заказ в Электростали. 20+ начинок с фото в разрезе, бенто, капкейки, трайфлы. Заказ в Telegram или Instagram.">
+  <title>MOM кондитер — торты и десерты на заказ в Электростали</title>
+  <meta name="description" content="Домашние торты и десерты на заказ в Электростали. 20+ начинок с фото в разрезе, бенто, капкейки, трайфлы. Заказ в Telegram, Instagram или MAX.">
   <meta name="theme-color" content="#f6efe6">
 
   <!-- Превью ссылки в Telegram / Инстаграме.
@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:site_name" content="MOM кондитер">
-  <meta property="og:title" content="MOM кондитер — торты на заказ в Электростали">
+  <meta property="og:title" content="MOM кондитер — торты и десерты на заказ в Электростали">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta property="og:description" content="Домашние торты и десерты из натуральных продуктов. Выберите начинку и напишите Марине в удобный мессенджер.">
@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Playfair+Display:ital,wght@1,400;1,500&amp;family=Montserrat:wght@800&amp;display=swap" media="print" onload="this.media='all'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Playfair+Display:ital,wght@1,400;1,500&amp;family=Montserrat:wght@800&amp;display=swap"></noscript>
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=34">
+  <link rel="stylesheet" href="styles.css?v=35">
 </head>
 <body>
   <!-- Иконки мессенджеров: монохромные, цвет берут у кнопки (currentColor) -->
@@ -267,12 +267,13 @@
         <input id="order-time" class="input" type="text" maxlength="40" autocomplete="off" placeholder="Например: к 15:00">
       </label>
 
-      <fieldset class="field field--plain">
+      <fieldset class="field field--plain" id="order-receive-field" aria-describedby="order-receive-error">
         <legend class="field__label">Доставка или самовывоз</legend>
         <div class="seg">
           <label class="seg__item"><input type="radio" name="order-receive" value="Доставка"><span>Доставка</span></label>
           <label class="seg__item"><input type="radio" name="order-receive" value="Самовывоз"><span>Самовывоз</span></label>
         </div>
+        <span class="field__error" id="order-receive-error" role="alert" hidden>Выберите доставку или самовывоз</span>
       </fieldset>
 
       <label class="field">
@@ -321,7 +322,7 @@
 
   <script src="data.js?v=22"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=22"></script>
+  <script src="script.js?v=23"></script>
   <!-- Декор: переключатели в data.js → decor -->
   <script src="decor.js?v=13"></script>
 </body>

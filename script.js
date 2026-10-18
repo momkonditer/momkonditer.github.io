@@ -692,6 +692,8 @@
     optionField: $("#order-option-field"),
     option: $("#order-option"),
     optionError: $("#order-option-error"),
+    receiveField: $("#order-receive-field"),
+    receiveError: $("#order-receive-error"),
     dateBtn: $("#order-date-btn"),
     nearest: $("#order-nearest"),
     cal: $("#order-cal"),
@@ -783,6 +785,12 @@
     else f.option.removeAttribute("aria-invalid");
   }
 
+  // доставка или самовывоз — обязательный выбор
+  function setReceiveError(on) {
+    f.receiveField.classList.toggle("has-error", on);
+    f.receiveError.hidden = !on;
+  }
+
   function openOrder(order, from) {
     current = order;
     opener = from || null;
@@ -791,6 +799,7 @@
     f.hint.textContent = HINT_BEFORE;
     f.hint.classList.remove("is-done");
     setOptionError(false);
+    setReceiveError(false);
     // пожелания по декору относятся к конкретному товару: у другого товара — чистое поле
     // (дата, время и способ получения остаются)
     const orderKey = `${order.type}:${order.item.id}`;
@@ -931,6 +940,7 @@
   }
 
   f.option.addEventListener("change", () => { if (f.option.value) setOptionError(false); });
+  $$('input[name="order-receive"]', dialog).forEach((r) => r.addEventListener("change", () => setReceiveError(false)));
 
   // Кнопки мессенджеров — ссылки <a href>: переход происходит сам, здесь только копируем текст
   const HINT_BEFORE = "Текст заявки скопируется автоматически.";
@@ -948,6 +958,15 @@
       setOptionError(true);
       f.option.focus();
       showToast("Выберите начинку");
+      return;
+    }
+    if (!$('input[name="order-receive"]:checked', dialog)) {
+      e.preventDefault();
+      setReceiveError(true);
+      const first = $('input[name="order-receive"]', dialog);
+      first.focus({ preventScroll: true });
+      f.receiveField.scrollIntoView({ block: "center", behavior: "smooth" });
+      showToast("Выберите доставку или самовывоз");
       return;
     }
     const text = buildText();
