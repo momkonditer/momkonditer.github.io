@@ -107,25 +107,6 @@
   .dc-priceTags .card:hover .card__price { animation: none; }
 }
 
-/* ===== Волнистое подчёркивание акцентных слов ===== */
-.decor-underlined { position: relative; isolation: isolate; white-space: nowrap; }  /* слово не переносится — линия под ним целиком */
-.decor-underline {
-  position: absolute; left: -2%; bottom: -0.06em; z-index: -1;
-  width: 106%; height: 0.32em;  /* +запас справа: курсив выступает за рамку слова */ overflow: visible; pointer-events: none;
-}
-.decor-underline path {
-  fill: none; stroke: var(--rose); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  /* длину штриха (stroke-dasharray/offset) ставит decor.js по реальному размеру слова */
-  transition: stroke-dashoffset .9s ease-out .15s;
-}
-.hero__script .decor-underline path { stroke: rgba(246, 211, 214, 0.55); }
-/* на первом экране слово крупное — линия ниже, чтобы не задевала буквы */
-.hero__script .decor-underline { bottom: -0.34em; left: -2%; width: 108%; }  /* курсив «ю» выступает вправо — линия с запасом */
-@media (prefers-reduced-motion: reduce) {
-  .decor-underline path { transition: none; }
-}
-
 /* ===== Плавная смена фона страницы при прокрутке (цвет ставит decor.js) ===== */
 /* фиксированные слои размером с экран между сливочным фоном и «мрамором» (body::before / ::after);
    меняется только opacity — это делает видеокарта, без перерисовки страницы */

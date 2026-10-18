@@ -10,10 +10,10 @@
   const D = (window.SITE && window.SITE.decor) || {};
   const on = (k) => D[k] === true;
   const KEYS = ["lambethDividers", "marquee", "marble", "lineArt", "scriptAccents", "revealAnimation",
-    "priceTags", "handUnderline", "scrollBackground"];
+    "priceTags", "scrollBackground"];
   if (!KEYS.some(on)) return;
 
-  const VERSION = "10";
+  const VERSION = "11";
   const root = document.documentElement;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (sel, r = document) => r.querySelector(sel);
@@ -130,81 +130,6 @@
       }));
       pending.forEach((n) => { if (!n.isConnected) { pending.delete(n); io.unobserve(n); } });
     }).observe(main, { childList: true, subtree: true });
-  }
-  /* ---------- Волнистое подчёркивание акцентных слов («выдавлено кондитерским мешком») ---------- */
-  if (on("handUnderline")) {
-    const NS = "http://www.w3.org/2000/svg";
-    // неровная волна в координатах 200×20: шаг и высота чуть гуляют, как у крема из мешка
-    const WAVE = "M2 11 C 14 4, 22 4, 33 10 S 52 17, 64 10 S 84 3, 97 9 S 117 16, 129 10 S 150 4, 162 9 S 183 15, 198 8";
-    const words = $$(".hero__script, .decor-script, .accent-word");
-
-    // Размер линии — из раскладки (ширина SVG в CSS = % от ширины слова), а не из getBoundingClientRect:
-    // на него влияют transform анимации появления. Волна строится в этих пикселях,
-    // preserveAspectRatio="none" — даже при устаревших размерах линия тянется на всю ширину, а не сжимается к центру.
-    function fit(w) {
-      const svg = w.querySelector(".decor-underline"), path = svg && svg.firstChild;
-      if (!path) return;
-      const cs = getComputedStyle(svg);
-      const width = parseFloat(cs.width), height = parseFloat(cs.height);
-      if (!(width > 0) || !(height > 0)) return;
-      let i = 0;
-      path.setAttribute("d", WAVE.replace(/\d+(\.\d+)?/g, (n) => (i++ % 2 ? n * height / 20 : n * width / 200).toFixed(1)));
-      svg.setAttribute("viewBox", `0 0 ${width.toFixed(1)} ${height.toFixed(1)}`);
-      const len = Math.ceil(path.getTotalLength()) + 2;
-      path.style.transition = "none";  // подгонка без анимации
-      path.style.strokeDasharray = `${len}`;
-      path.style.strokeDashoffset = w.classList.contains("is-drawn") ? "0" : `${len}`;
-      path.getBoundingClientRect();
-      path.style.transition = "";
-    }
-    const fitAll = () => words.forEach(fit);
-
-    words.forEach((w) => {
-      if (w.querySelector(".decor-underline")) return;
-      const svg = document.createElementNS(NS, "svg");
-      svg.setAttribute("class", "decor-underline");
-      svg.setAttribute("preserveAspectRatio", "none");
-      svg.setAttribute("aria-hidden", "true");
-      svg.setAttribute("focusable", "false");
-      svg.append(document.createElementNS(NS, "path"));
-      w.classList.add("decor-underlined");
-      w.append(svg);
-      fit(w);
-    });
-
-    // Пересчёт: шрифт загрузился (общий и именно Playfair Display), страница догрузилась, изменился размер
-    if (document.fonts) {
-      if (document.fonts.ready) document.fonts.ready.then(fitAll);
-      if (document.fonts.load) document.fonts.load('italic 400 1em "Playfair Display"').then(fitAll, () => {});
-      if (document.fonts.addEventListener) document.fonts.addEventListener("loadingdone", fitAll);
-    }
-    window.addEventListener("load", fitAll);
-    let resizeTimer = 0;
-    window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(fitAll, 150); });
-    // ResizeObserver на inline-span не срабатывает — следим за заголовками
-    if ("ResizeObserver" in window) {
-      const ro = new ResizeObserver(fitAll);
-      new Set(words.map((w) => w.closest("h1, h2, h3") || w.parentElement)).forEach((h) => ro.observe(h));
-    }
-
-    const draw = (w) => {
-      fit(w);  // перед рисованием — по текущей ширине слова
-      requestAnimationFrame(() => {
-        w.classList.add("is-drawn");
-        const path = w.querySelector(".decor-underline path");
-        if (path) path.style.strokeDashoffset = "0";
-      });
-    };
-    if (reduce || !("IntersectionObserver" in window)) {
-      words.forEach((w) => { w.classList.add("is-drawn"); fit(w); });
-    } else {
-      const io = new IntersectionObserver((entries) => entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        draw(e.target);
-        io.unobserve(e.target);
-      }), { rootMargin: "0px 0px -10% 0px" });
-      words.forEach((w) => io.observe(w));
-    }
   }
   /* ---------- Фон страницы плавно меняет оттенок при прокрутке ---------- */
   if (on("scrollBackground")) {

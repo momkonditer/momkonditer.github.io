@@ -283,10 +283,6 @@
     $$("[data-text]").forEach((n) => (n.textContent = values[n.dataset.text] || ""));
     $$("[data-setting]").forEach((n) => (n.textContent = D[n.dataset.setting]));
 
-    // Полоса фактов под первым экраном: начинок — по данным (вниз до десятков с «+»)
-    const nFill = D.fillings.length;
-    $("#fact-fillings").textContent = nFill >= 10 ? `${Math.floor(nFill / 10) * 10}+` : String(nFill);
-
     const terms = ["Оптимально заказывать за 2–3 недели до события (свадебные торты — заранее, уточняйте). При возможности возьму заказ даже за 2–3 дня.",
       `Предоплата ${D.prepayment}% от стоимости — обязательна для всех заказов.`]
       .concat(D.cancelDays > 0
