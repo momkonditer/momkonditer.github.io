@@ -138,7 +138,7 @@ window.SITE = {
       phone: "+7 (916) 501-57-28",
       address: "Электросталь, ул. Тевосяна, 21",
       instagram: "@momdesertmarina",   // кнопка ведёт сразу в личные сообщения (ig.me/m/…)
-      max: "",                         // ссылка на MAX (https://max.ru/…); пусто — кнопки MAX на сайте нет
+      max: "https://max.ru/u/f9LHodD0cOIiy06VlyXID3Rx34gFFj1WsqzgLU4PXKHhic-w5iU-oNGhnUU",  // ссылка на MAX (https://max.ru/…); пусто — кнопки MAX на сайте нет
       delivery: "Доставка только по Электростали",
     },
 
