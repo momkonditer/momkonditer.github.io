@@ -16,11 +16,8 @@
   <meta name="apple-mobile-web-app-title" content="MOM админка">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Шрифты грузятся без блокировки показа страницы -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Oswald:wght@500;700&family=Playfair+Display:ital,wght@1,400;1,500&family=Montserrat:wght@800&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Oswald:wght@500;700&family=Playfair+Display:ital,wght@1,400;1,500&family=Montserrat:wght@800&display=swap"></noscript>
+  <!-- Шрифты лежат на сайте (fonts/), к Google браузер не обращается -->
+  <link rel="stylesheet" href="../fonts.css?v=1">
   <link rel="stylesheet" href="../calendar.css">
   <link rel="stylesheet" href="admin.css?v=3">
 </head>
@@ -46,7 +43,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="../data.js?v=17"></script>
+  <script src="../data.js?v=18"></script>
   <script src="../calendar.js"></script>
   <script src="admin.js?v=10"></script>
 </body>

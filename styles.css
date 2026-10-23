@@ -525,6 +525,7 @@ button { font: inherit; color: inherit; }
 .contacts dd a[href] { display: inline-flex; align-items: center; min-height: 44px; min-width: 44px; margin: -12px 0; }
 .selectable { user-select: all; -webkit-user-select: all; }
 .contacts__actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.contacts__note { margin: 14px 0 0; font-size: 12px; font-weight: 300; line-height: 1.45; color: var(--muted); }
 
 /* ===== Футер ===== */
 .footer { padding: 36px 0 110px; background: var(--ink); color: #e9ded3; }
@@ -533,6 +534,7 @@ button { font: inherit; color: inherit; }
 .footer .logo__script { color: var(--rose); }
 .footer p { font-size: 14px; }
 .footer__small { color: #b6a89c; font-weight: 300; }
+.footer p.footer__note { font-size: 12px; line-height: 1.45; }
 .footer__links a { color: #fff; text-decoration-color: rgba(232, 195, 195, 0.6); text-underline-offset: 4px; }
 .footer__links a:hover { color: var(--rose); }
 /* «·» между ссылками — только между видимыми (пустой мессенджер скрыт) */

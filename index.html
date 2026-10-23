@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>MOM кондитер — торты и десерты на заказ в Электростали</title>
-  <meta name="description" content="Домашние торты и десерты на заказ в Электростали. 20+ начинок с фото в разрезе, бенто, капкейки, трайфлы. Заказ в Telegram, Instagram или MAX.">
+  <meta name="description" content="Домашние торты и десерты на заказ в Электростали. 20+ начинок с фото в разрезе, бенто, капкейки, трайфлы. Заказ в Telegram или MAX.">
   <meta name="theme-color" content="#f6efe6">
 
   <!-- Превью ссылки в Telegram / Инстаграме. Картинка — images/og.jpg (1200×630), адрес полный: мессенджеры относительный не понимают.
@@ -22,13 +22,10 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Шрифты грузятся без блокировки показа страницы -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Playfair+Display:ital,wght@1,400;1,500&amp;family=Montserrat:wght@800&amp;display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Unicase:wght@300;400;500&amp;family=Jost:wght@300;400;500&amp;family=Playfair+Display:ital,wght@1,400;1,500&amp;family=Montserrat:wght@800&amp;display=swap"></noscript>
+  <!-- Шрифты лежат на сайте (fonts/), к Google браузер не обращается -->
+  <link rel="stylesheet" href="fonts.css?v=1">
   <link rel="stylesheet" href="calendar.css">
-  <link rel="stylesheet" href="styles.css?v=35">
+  <link rel="stylesheet" href="styles.css?v=36">
 </head>
 <body>
   <!-- Иконки мессенджеров: монохромные, цвет берут у кнопки (currentColor) -->
@@ -191,6 +188,7 @@
           <a class="btn btn--primary" data-msg="instagram" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-ig"/></svg>Instagram</a>
           <a class="btn btn--primary" data-msg="max" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-max"/></svg>MAX</a>
         </div>
+        <p class="contacts__note" data-msg-row="instagram">Instagram принадлежит компании Meta, признанной экстремистской организацией и запрещённой в РФ</p>
       </div>
     </section>
   </main>
@@ -202,6 +200,9 @@
       <!-- точки между ссылками ставит CSS — пропавший мессенджер не оставит лишнюю «·» -->
       <p class="footer__links"><a data-msg="telegram" target="_blank" rel="noopener">Telegram</a><a data-msg="instagram" target="_blank" rel="noopener">Instagram</a><a data-msg="max" target="_blank" rel="noopener">MAX</a></p>
       <p class="footer__small">Заказ, оплата и детали — в личной переписке в мессенджере.</p>
+      <p class="footer__small footer__note" data-msg-row="instagram">Instagram принадлежит компании Meta, признанной экстремистской организацией и запрещённой в РФ</p>
+      <!-- Строку заполняет script.js из sellerName / sellerInn; пока поля пустые — её нет -->
+      <p class="footer__small" id="seller" hidden></p>
       <p class="footer__small footer__copy">© 2026 MOM кондитер</p>
     </div>
   </footer>
@@ -323,9 +324,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=22"></script>
+  <script src="data.js?v=23"></script>
   <script src="calendar.js"></script>
-  <script src="script.js?v=23"></script>
+  <script src="script.js?v=24"></script>
   <!-- Декор: переключатели в data.js → decor -->
   <script src="decor.js?v=13"></script>
 </body>

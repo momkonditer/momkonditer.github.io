@@ -140,6 +140,8 @@ window.SITE = {
       instagram: "@momdesertmarina",   // кнопка ведёт сразу в личные сообщения (ig.me/m/…)
       max: "https://max.ru/u/f9LHodD0cOIiy06VlyXID3Rx34gFFj1WsqzgLU4PXKHhic-w5iU-oNGhnUU",  // ссылка на MAX (https://max.ru/…); пусто — кнопки MAX на сайте нет
       delivery: "Доставка только по Электростали",
+      sellerName: "",         // ФИО для строки в футере «Самозанятая …, ИНН …»; пусто — строки нет
+      sellerInn: "",          // ИНН; пусто — строки нет
     },
 
     // Начинки. price — за 1 кг. photo: пусто → images/fillings/<id>.jpg

@@ -81,6 +81,8 @@
       phoneHref: phoneHref(s.phone),
       pickupAddress: String(s.address || ""),
       delivery: String(s.delivery || ""),
+      sellerName: String(s.sellerName || "").trim(),
+      sellerInn: String(s.sellerInn || "").trim(),
     };
 
     const list = (arr, fbArr) => (Array.isArray(arr) ? arr : fbArr)
@@ -298,6 +300,10 @@
     $$("[data-phone]").forEach((a) => (C.phoneHref ? (a.href = C.phoneHref) : a.removeAttribute("href")));
     $$("[data-text]").forEach((n) => (n.textContent = values[n.dataset.text] || ""));
     $$("[data-setting]").forEach((n) => (n.textContent = D[n.dataset.setting]));
+    // Данные продавца в футере — только когда заполнены оба поля
+    const seller = $("#seller");
+    seller.hidden = !(C.sellerName && C.sellerInn);
+    seller.textContent = seller.hidden ? "" : `Самозанятая ${C.sellerName}, ИНН ${C.sellerInn}`;
 
     const terms = ["Оптимально заказывать за 2–3 недели до события (свадебные торты — заранее, уточняйте). При возможности возьму заказ даже за 2–3 дня.",
       `Предоплата ${D.prepayment}% от стоимости — обязательна для всех заказов.`]
@@ -305,7 +311,8 @@
         ? `При отказе позже чем за ${D.cancelDays} ${daysWord(D.cancelDays)} до выдачи предоплата не возвращается.`
         : "При отказе в день выдачи предоплата не возвращается.")
       .concat(C.pickupAddress ? [`Самовывоз: ${C.pickupAddress}.`] : [])
-      .concat(C.delivery ? [`${C.delivery.replace(/\.$/, "")}.`] : []);
+      .concat(C.delivery ? [`${C.delivery.replace(/\.$/, "")}.`] : [])
+      .concat("Торты и десерты изготавливаются индивидуально под заказ, поэтому возврату не подлежат. Если что-то не так с качеством — напишите мне, решим.");
     $("#terms-list").replaceChildren(...terms.map((t) => el("li", { text: t })));
 
     const promos = [
